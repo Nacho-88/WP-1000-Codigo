@@ -10,17 +10,18 @@ function [n] = n_capa(z)
 
 
 
-% % Comprobación valores de inputs:
-% if z<0
-%     error("Error en el parámetro de la función 'n_capa': la altitud debe ser positiva.")
-% end
+%% Comprobación valores de inputs:
+if z<0
+    warning("Error en el parámetro de la función 'n_capa': la altitud debe ser positiva.")
+end
 
 
-% Cargar valores de constantes necesarias
-load ../constantes.mat T_n z_n R_T
+%% Cargar valores de constantes necesarias
+% load ../constantes.mat T_n z_n R_T % Versión para ejecutar desde la carpeta "Funciones"
+load constantes.mat T_n z_n R_T % Versión para ejecutar desde el main
 
 
-% Inicio del código funcional
+%% Inicio del código funcional
 n = 0;
 
 for i=1:length(z_n)

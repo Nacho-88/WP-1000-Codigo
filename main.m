@@ -54,6 +54,49 @@ save constantes G R_T M_T g_0 P_0 T_n z_n
 
 %% Resolución ecuación del movimiento
 
+% Cambio de la ruta de búsqueda para poder buscar en la carpeta de funciones.
+ruta = addpath('Funciones');
+
+
+% Definición condiciones iniciales y parámetros para Runge-Kutta:
+dt = 60;        % s
+t0 = 0;         % s
+tf = 3*3600;    % s
+z0 = 0;         % m
+dz_dt0 = 0;     % m/s
+
+w0 = [dz_dt0, z0]';
+
+f = @(t, w) ec_mov(t, w, m_He);
+
+% Uso Runge-Kutta para la resolución del sistema de ecuaciones diferenciales
+[t, w] = Metodo_RK4(dt, t0, tf, f, w0);
+
+% Desglose de la matriz devuelta por RK en velocidades y altitudes (vectores fila)
+dz_dt = w(1,:); % m/s
+z = w(2,:);     % m
+
+
+% Si no hemos alcanzado altitud 0 (o próxima a 0) continuamos un tiempo
+% extra hasta alcanzarlo:
+if z(end)>1e-3
+    tf_add = 3600; % Tiempo añadido (en segundos) para alcanzar altitud 0
+    [t_aux, w_aux] = Metodo_RK4(dt, tf, tf+tf_add, f, w(:,end));
+    
+    % Añadimos los nuevos valores de tiempos y el vector de estados.
+    t = [t, t_aux(2:end)];
+    w = [w(1,:), w_aux(1,:); w(2,:), w_aux(2,:)];
+
+    % Desglose de la matriz
+    dz_dt = w(1,:);
+    z = w(2,:);
+end
+
+
+% Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
+path(ruta)
+clear ruta tf_add t_aux w_aux
+
 
 
 %% Gráficas y datos importantes a comparar
