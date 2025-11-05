@@ -32,10 +32,12 @@ T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5]; % ºC
 T_n = T_n + 273.15.*ones(size(T_n));        % K
 z_n = 1e3 .* [0, 11, 20, 32, 47, 51, 71];   % m
 
+R_exp = 12; % m
+
+m_He = 2;   % kg
 
 r_globo=1;
 c_d=0.75;
-m_He=2;
 dpar=1.64;
 m_atomicaHe=4;
 Cd=0.3;
@@ -67,7 +69,7 @@ dz_dt0 = 0;     % m/s
 
 w0 = [dz_dt0, z0]';
 
-f = @(t, w) ec_mov(t, w, m_He);
+f = @(t, w) ec_mov(t, w, m_He, R_exp);
 
 % Uso Runge-Kutta para la resolución del sistema de ecuaciones diferenciales
 [t, w] = Metodo_RK4(dt, t0, tf, f, w0);
