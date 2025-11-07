@@ -24,24 +24,73 @@
 %% Constantes
 G   = 6.67e-11; % N * m^2 / (kg^2)
 M_T = 5.97e24;  % kg
-R_T = 6.37e6;   % m
+R_T = 6371000;  % Radio de la Tierra medio (m)
 g_0 = 9.81;     % m / s^2
 P_0 = 101325;   % Pa
 
-T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5]; % ºC
-T_n = T_n + 273.15.*ones(size(T_n));        % K
-z_n = 1e3 .* [0, 11, 20, 32, 47, 51, 71];   % m
+z_star = 12000; % Límite para cambio de formula (m)
+
+R = 287.053;  % J/(kg·K)
+
+m_a = 0.0289644;        % kg/mol
+
+m_He_molar = 0.0040026;   % kg/mol
+
+
+% T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5]; % ºC
+% T_n = T_n + 273.15.*ones(size(T_n));        % K
+% z_n = 1e3 .* [0, 11, 20, 32, 47, 51, 71];   % m
+
+z_n_geop = [0, 11000, 20000, 32000, 47000, 51000, 71000];   % Vectores Altitud (geopotencial)
+
+T_n = [288, 216.5, 216.5, 228.5, 270.5, 270.5, 214.5];      % Temperatura (K)
+
+z_n_geom = (R_T .* z_n_geop) ./ (R_T - z_n_geop);           % Pasar de geopotencial a geometrica
+
 
 R_exp = 12; % m
 
 m_He = 2;   % kg
 
-r_globo=1;
-c_d=0.75;
+% r_globo=1;
+% c_d=0.75;
 dpar=1.64;
 m_atomicaHe=4;
-Cd=0.3;
+% Cd=0.3;
 v=5.33;
+
+C_D_caja = 1.57439;   % Coeficiente de arrastre caja
+
+C_D_globo = 0.3;      % Coeficiente de arrastre globo
+
+C_D_paraca_1 = 0.97;  % Coeficiente de paracaidas 1
+
+C_D_paraca_2 = 1.17;  % Coeficiente de paracaidas 2
+
+
+l_caja_globo = 37;         % Longitud (m) de la cuerda entre globo y payload
+
+l_caja_paraca1  = 12.0;    % Caja – Paracaídas 1
+
+l_paraca1_paraca2 = 15.0;  % Paracaídas 1 – Paracaídas 2
+
+l_paraca2_globo = 10.0;    % Paracaídas 2 – Globo
+
+
+A_caja = 0.098;    % Area payload [m^2]
+
+A1 = 3.25;         % Area paracaidas 1
+
+A2 = 1.13;         % Area paracaidas 1
+
+
+M_caja = 2;        % Masa del payload (kg)
+
+M_globo = 2;       % Masa del globo (kg)
+
+M_paraca1 = 0.23;  % Masa paracaidas 1
+
+M_paraca2 = 0.08;   % Masa paracaidas 1
 
 % %Fórmula temperatura atmosférica
 % Tp = @(z) Tn + (z - zn) * (Tnp1 - Tn) / (znp1 - zn);
@@ -115,3 +164,5 @@ clear ruta tf_add t_aux w_aux index z_aux
 
 
 %% Gráficas y datos importantes a comparar
+
+
