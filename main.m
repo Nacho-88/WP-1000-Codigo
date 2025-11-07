@@ -81,7 +81,7 @@ z = w(2,:);     % m
 
 % Si no hemos alcanzado altitud 0 (o próxima a 0) continuamos un tiempo
 % extra hasta alcanzarlo:
-if z(end)>1e-3
+if z(end)>(L_z/2)
     tf_add = 3600; % Tiempo añadido (en segundos) para alcanzar altitud 0
     [t_aux, w_aux] = Metodo_RK4(dt, tf, tf+tf_add, f, w(:,end));
     
@@ -95,9 +95,22 @@ if z(end)>1e-3
 end
 
 
+% Desplazamiento de la altitud para que corresponda al payload en vez del globo:
+load parametros.mat z_exp t_exp
+z_aux = z(1);
+index = 1;
+while (z_aux<z_exp)
+    z(index) = z(index) - R_globo(z(index)) - l_c;
+    index = index + 1;
+    z_aux = z(index);
+end
+
+save parametros z dz_dt t   % Guardamos los parámetros calculados.
+
+
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
 path(ruta)
-clear ruta tf_add t_aux w_aux
+clear ruta tf_add t_aux w_aux index z_aux
 
 
 
