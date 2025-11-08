@@ -13,10 +13,11 @@ termino_presion = (Pm_zexp / P_np)^(3/5);
 % 3. Término del factor final
 [T_k] = generar_T_k() ;
 T_ref = T_k(n);
-termino_factor = (P_np / (R_prime*T_ref));
+termino_factor = (P_np / (R_prima*T_ref));
 
 % --- Cálculo final ---
 % M_He = (Término 1) * (Término 2) * (Término 3)
 M_He = termino_volumen * termino_presion * termino_factor;
 
 end
+
