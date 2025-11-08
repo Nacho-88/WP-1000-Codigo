@@ -8,9 +8,9 @@ function empuje = E(z, m_he)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Radio del globo
-R_z = R_globo(z, m_he);
+R_g = R_globo(z, m_he);
 
-if R_z <= 0
+if R_g <= 0
    empuje = 0;
    return;
 end
@@ -23,8 +23,8 @@ if mod(N,2) ~= 0
 end
 
 % Integración
-a = -R_z;
-b = R_z;
+a = -R_g;
+b = R_g;
 
 x = linspace(a, b, N+1);  % vector de nodos
 dx = (b - a) / N;         % paso entre nodos

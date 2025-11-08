@@ -23,47 +23,20 @@ T_n = [288, 216.5, 216.5, 228.5, 270.5, 270.5, 214.5];
 z_n_geom = (R_T .* z_n_geop) ./ (R_T - z_n_geop);
 
 % Calcular P_n capa a capa
-P_n = zeros(size(z_n_geom));
-P_n(1) = 101325;               % P_0 = 1 atm
-
-for n = 1:length(z_n_geom)-1
-    dz = z_n_geom(n+1) - z_n_geom(n);
-    dT = T_n(n+1) - T_n(n);
-
-    if dT ~= 0 % T_{n+1} ~= T_n ->  % P_{n+1} = P_n * (1 + ((dzg)*dT)/(dzg*T_n))^((-g0*dzg)/(R*dT))
-       P_n(n+1) = P_n(n)*(1+(((z_n_geom(n+1)*(R_T/(R_T+z_n_geom(n+1)))-z_n_geom(n))*dT)/(dz * T_n(n))))^((-g_0*dz)/(R*dT));
-
-    else % T_{n+1} = T_n -> P_{n+1} = P_n * exp( (-g0*dzg)/(R*T_n)
-       P_n(n+1) = P_n(n)*exp((-g_0*(z_n_geom(n+1)*(R_T/(R_T+z_n_geom(n+1)))-z_n_geom(n)))/(R*T_n(n)));
-
-    end
-
-end
-
+P_n = generar_P_n();
 
 % Localizar capa
-n = find(z >= z_n_geom(1:end-1) & z < z_n_geom(2:end), 1, 'first');
-
-if isempty(n)
-    if z < z_n_geom(1)
-        n = 1;                           % por debajo de 0
-    else
-        n = length(z_n_geom) - 1;        % por encima del rango máximo
-    end
-end
-
-z0  = z_n_geom(n);                       % Límite inferior de la capa
-T0  = T_n(n);                            
-P0  = P_n(n);                            
-dz  = z_n_geom(n+1) - z_n_geom(n);       
-dT  = T_n(n+1) - T_n(n);                 
-
+n = n_capa(z);
 
 % Evaluar P(z)
+
+dz  = z_n_geom(n+1) - z_n_geom(n);       
+dT  = T_n(n+1) - T_n(n);
+
 if dT ~= 0
-    P = P0 * (1 + (((z * (R_T / (R_T + z)) - z0) * dT) / (dz * T0))) ^ ((-g_0 * dz) / (R * dT));
+    P = P_n(n) * (1 + (((z * (R_T / (R_T + z)) - z_n_geom(n)) * dT) / (dz * T_n(n)))) ^ ((-g_0 * dz) / (R * dT));
 else
-    P = P0 * exp((-g_0 * ((z * (R_T / (R_T + z)) - z0))) / (R * T0));
+    P = P_n(n) * exp((-g_0 * ((z * (R_T / (R_T + z)) - z_n_geom(n)))) / (R * T_n(n)));
 end
 
 end
