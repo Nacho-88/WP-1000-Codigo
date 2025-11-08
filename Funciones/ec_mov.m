@@ -1,5 +1,5 @@
 function [dw_dt] = ec_mov(t, w, m_He, R_exp)
-% EC_MOV: función que define el sistema de ecuaciones diferenciales: f(y,t) = dy/dt
+% EC_MOV: función que define el sistema de ecuaciones diferenciales: f(t,y) = dy/dt
 %
 % -'t' es el tiempo (en segundos).
 %
@@ -42,8 +42,9 @@ load constantes.mat m_latex m_caja m_paraca_1 m_paraca_2 l_c L_z % Versión para
 % Comprobamos si estamos en ascenso o descenso (dz_dt>0 ó dz_dt<0 resp.)
 
 if (w(1)>0 | t==0) & (R_globo(w(2))<R_exp)  % Cuando t=0 entonces dz_dt=0, en cualquier otro caso donde dz_dt<=0 (o el radio no sea inferior al de explosión) no estamos en ascenso
-
-    dw_dt = [(E(w(2), m_he) + F_roz(w(2),w(1)) - F_g(w(2), w(1), m_He))/(m_He + m_latex + m_caja + m_paraca_1 + m_paraca_2), ...
+    
+    isFalling = false;  % Estamos en ascenso.
+    dw_dt = [(E(w(2), m_he) + F_roz(w(2),w(1),isFalling) - F_g(w(2),w(1),m_He,isFalling))/(m_He + m_latex + m_caja + m_paraca_1 + m_paraca_2), ...
             w(1)]';
 
 elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el 
@@ -51,7 +52,8 @@ elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el
                         % ascenso a descenso, por lo que para calcular los 
                         % siguientes puntos usamos la ecuación de descenso)
 
-    dw_dt = [(F_roz(w(2), w(1)) - F_g(w(2), w(1), m_He))/(m_caja + m_paraca_1 + m_paraca_2), ...
+    isFalling = true;   % Estamos en descenso.
+    dw_dt = [(F_roz(w(2), w(1), isFalling) - F_g(w(2), w(1), m_He, isFalling))/(m_caja + m_paraca_1 + m_paraca_2), ...
             w(1)]';
 
 elseif (w(1)>0) & (R_globo(w(2))>=R_exp)    % Momento de explosión del globo
@@ -66,8 +68,8 @@ elseif (w(1)>0) & (R_globo(w(2))>=R_exp)    % Momento de explosión del globo
     % save ../parametros t_exp z_exp % Versión para ejecutar desde la carpeta "Funciones"
     save parametros t_exp z_exp % Versión para ejecutar desde el main.
 
-
-    dw_dt = [(F_roz(w(2), w(1)) - F_g(w(2), w(1), m_He))/(m_caja + m_paraca_1 + m_paraca_2), ...
+    isFalling = true;   % Pasamos de ascenso a descenso.
+    dw_dt = [(F_roz(w(2), w(1), isFalling) - F_g(w(2), w(1), m_He, isFalling))/(m_caja + m_paraca_1 + m_paraca_2), ...
             w(1)]';
 
 else    % No deberíamos entrar aquí

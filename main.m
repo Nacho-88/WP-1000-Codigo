@@ -50,7 +50,7 @@ z_n_geom = (R_T .* z_n_geop) ./ (R_T - z_n_geop);           % Pasar de geopotenc
 
 R_exp = 12; % m
 
-m_He = 2;   % kg
+m_He = calcularMasaHelio(R_exp,z_exp);   % kg
 
 % r_globo=1;
 % c_d=0.75;
@@ -164,5 +164,6 @@ clear ruta tf_add t_aux w_aux index z_aux
 
 
 %% Gráficas y datos importantes a comparar
+
 
 
