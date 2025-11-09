@@ -25,7 +25,7 @@
 G   = 6.67e-11; % N * m^2 / (kg^2)
 M_T = 5.97e24;  % kg
 R_T = 6371000;  % Radio de la Tierra medio (m)
-g_0 = 9.81;     % m / s^2
+g_0 = 9.80665;  % m / s^2
 P_0 = 101325;   % Pa
 
 
@@ -41,9 +41,10 @@ R_prima = (m_a / m_He_molar) * R;  % J/(kg*K)
 
 
 % Separación en capas del modelo
-z_n = [0, 11000, 20000, 32000, 47000, 51000, 71000];   % Altitudes (geopotenciales) (m)
+z_n = [0, 11000, 20000, 32000, 47000, 51000, 71000];    % Altitudes (geopotenciales) (m)
 
-T_n = [288, 216.5, 216.5, 228.5, 270.5, 270.5, 214.5];      % Temperaturas (K)
+T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5];     % Temperaturas (ºC)
+T_n = T_n + 273.15*ones(size(T_n));                     % Temperaturas (K)
 
 
 % Coeficientes de arrastre (adimensionales)
