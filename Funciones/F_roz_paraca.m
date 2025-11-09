@@ -8,13 +8,13 @@ function F_paraca = F_roz_paraca(z, dz_dt)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Llamar constantes
-load constantes C_D_paraca_1 C_D_paraca_2 A1 A2 l_caja_paraca1 l_paraca1_paraca2 Lz
+load constantes C_D_paraca_1 C_D_paraca_2 A1 A2 l_caja_paraca1 l_paraca1_paraca2 L_z
 
 % Densidad de la atmosfera
-z_paraca1 = z + (Lz/2) + l_caja_paraca1;
+z_paraca1 = z + (L_z/2) + l_caja_paraca1;
 rho1 = rho_atm(z_paraca1);
 
-z_paraca2 = z + (Lz/2) + l_caja_paraca1 + l_paraca1_paraca2;
+z_paraca2 = z + (L_z/2) + l_caja_paraca1 + l_paraca1_paraca2;
 rho2 = rho_atm(z_paraca2);
 
 % Solo descenso

@@ -44,7 +44,7 @@ load constantes.mat M_globo M_caja M_paraca1 M_paraca2 l_caja_globo L_z % Versi�
 if (w(1)>0 | t==0) & (R_globo(w(2),m_He)<R_exp)  % Cuando t=0 entonces dz_dt=0, en cualquier otro caso donde dz_dt<=0 (o el radio no sea inferior al de explosión) no estamos en ascenso
     
     isFalling = false;  % Estamos en ascenso.
-    dw_dt = [(E(w(2), m_He) + F_roz(w(2),w(1),m_He,isFalling) - F_g(w(2),w(1),m_He,isFalling))/(m_He + M_globo + M_caja + M_paraca1 + M_paraca2), ...
+    dw_dt = [(E(w(2), m_He) + F_roz(w(2),w(1),m_He,isFalling) - F_g(w(2),m_He,isFalling))/(m_He + M_globo + M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
 elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el 
@@ -53,7 +53,7 @@ elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el
                         % siguientes puntos usamos la ecuación de descenso)
 
     isFalling = true;   % Estamos en descenso.
-    dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), w(1), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
+    dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
 elseif (w(1)>0) & (R_globo(w(2))>=R_exp)    % Momento de explosión del globo
@@ -69,7 +69,7 @@ elseif (w(1)>0) & (R_globo(w(2))>=R_exp)    % Momento de explosión del globo
     save parametros t_exp z_exp -append     % Versión para ejecutar desde el main.
 
     isFalling = true;   % Pasamos de ascenso a descenso.
-    dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), w(1), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
+    dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
 else    % No deberíamos entrar aquí

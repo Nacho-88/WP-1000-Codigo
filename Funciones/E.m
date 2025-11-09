@@ -18,7 +18,8 @@ end
 
 
 % Intervalos par para el método de Simpson
-N = 200;
+% N = 200;
+N = 20;
 
 if mod(N,2) ~= 0
   N = N + 1;

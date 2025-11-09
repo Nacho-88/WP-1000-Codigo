@@ -8,7 +8,7 @@ function F_caja = F_roz_caja(z, dz_dt, m_He,isFalling)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Llamar constantes
-load constantes C_D_caja l_caja_globo Lz A_caja
+load constantes C_D_caja l_caja_globo L_z A_caja
 
 % Radio del globo
 R_g = R_globo(z, m_He);
@@ -18,7 +18,7 @@ if ~isFalling
     z_caja = z-R_g-l_caja_globo;
     signo_velo = +1;
 else
-    z_caja = z+(Lz/2);
+    z_caja = z+(L_z/2);
     signo_velo = -1;
 end
 

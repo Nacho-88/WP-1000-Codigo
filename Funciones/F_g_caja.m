@@ -9,7 +9,6 @@
 %
 % Inputs:
 %   z         -> altitud real [m]
-%   dz_dt     -> velocidad vertical [m/s] (actualmente no se usa)
 %   isFalling -> booleano (true si está descendiendo, false si ascendiendo)
 %
 % Output:
@@ -32,7 +31,7 @@ load constantes.mat G M_T R_T M_caja L_z l_caja_globo
     else
         %ASCENSO
        
-        F = G *M_T * M_caja / ((R_T + z - (R_globo(z, m_He) + l_caja_globo + L_z))*(R_T + z - (R_globo(z, m_He) + l_caja_globo));
+        F = G *M_T * M_caja / ((R_T + z - (R_globo(z, m_He) + l_caja_globo + L_z))*(R_T + z - (R_globo(z, m_He) + l_caja_globo)));
     end
 
 end

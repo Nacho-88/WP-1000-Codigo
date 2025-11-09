@@ -10,7 +10,6 @@
 %
 % Inputs:
 %   z      -> altitud real [m]
-%   dz_dt  -> velocidad de ascenso [m/s] 
 %   m_He   -> masa de Helio [kg]
 %
 % Output:

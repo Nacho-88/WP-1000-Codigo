@@ -88,7 +88,7 @@ M_paraca1 = 0.23;  % Masa paracaídas 1 (kg)
 M_paraca2 = 0.08;  % Masa paracaídas 2 (kg)
 
 
-save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n T_n C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 
+save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n T_n C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo L_x L_y L_z A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 
 
 %% Parámetros variables
 
@@ -120,9 +120,14 @@ path(ruta);
 % Cambio de la ruta de búsqueda para poder buscar en la carpeta de funciones.
 ruta = addpath('Funciones');
 
+% Dado que se empieza con velocidad 0, el rozamiento no se tiene en cuenta
+% en el primer cálculo, esto da una aceleración muy elevada que debería
+% durar poco tiempo, por lo que vamos a considerar un paso pequeño para los
+% primeros 15 puntos y después aumentaremos el paso ya que las
+% aceleraciones serán pequeñas.
 
 % Definición condiciones iniciales y parámetros para Runge-Kutta:
-dt = 60;        % s
+dt = 1;         % s
 t0 = 0;         % s
 tf = 3*3600;    % s
 
@@ -138,6 +143,7 @@ f = @(t, w) ec_mov(t, w, m_He, R_exp);
 
 % Uso Runge-Kutta para la resolución del sistema de ecuaciones diferenciales
 [t, w] = Metodo_RK4(dt, t0, tf, f, w0);
+
 
 % Desglose de la matriz devuelta por RK en velocidades y altitudes (vectores fila)
 dz_dt = w(1,:); % m/s
@@ -170,7 +176,7 @@ while (z_aux<z_exp)
     z_aux = z(index);
 end
 
-save parametros z dz_dt t   % Guardamos los parámetros calculados.
+save parametros z dz_dt t -append   % Guardamos los parámetros calculados.
 
 
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
