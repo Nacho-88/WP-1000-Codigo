@@ -33,18 +33,18 @@ end
 
 
 %% Cargar constantes necesarias
-% load ../constantes.mat m_latex m_caja m_paraca_1 m_paraca_2 l_c L_z % Versión para ejecutar desde la carpeta "Funciones"
-load constantes.mat m_latex m_caja m_paraca_1 m_paraca_2 l_c L_z % Versión para ejecutar desde el main.
+% load ../constantes.mat m_globo m_caja m_paraca_1 m_paraca_2 l_caja_globo L_z % Versión para ejecutar desde la carpeta "Funciones"
+load constantes.mat M_globo M_caja M_paraca1 M_paraca2 l_caja_globo L_z % Versión para ejecutar desde el main.
 
 
 %% Definición de la ecuación del movimiento
 
 % Comprobamos si estamos en ascenso o descenso (dz_dt>0 ó dz_dt<0 resp.)
 
-if (w(1)>0 | t==0) & (R_globo(w(2))<R_exp)  % Cuando t=0 entonces dz_dt=0, en cualquier otro caso donde dz_dt<=0 (o el radio no sea inferior al de explosión) no estamos en ascenso
+if (w(1)>0 | t==0) & (R_globo(w(2),m_He)<R_exp)  % Cuando t=0 entonces dz_dt=0, en cualquier otro caso donde dz_dt<=0 (o el radio no sea inferior al de explosión) no estamos en ascenso
     
     isFalling = false;  % Estamos en ascenso.
-    dw_dt = [(E(w(2), m_he) + F_roz(w(2),w(1),isFalling) - F_g(w(2),w(1),m_He,isFalling))/(m_He + m_latex + m_caja + m_paraca_1 + m_paraca_2), ...
+    dw_dt = [(E(w(2), m_He) + F_roz(w(2),w(1),m_He,isFalling) - F_g(w(2),w(1),m_He,isFalling))/(m_He + M_globo + M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
 elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el 
@@ -53,23 +53,23 @@ elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el
                         % siguientes puntos usamos la ecuación de descenso)
 
     isFalling = true;   % Estamos en descenso.
-    dw_dt = [(F_roz(w(2), w(1), isFalling) - F_g(w(2), w(1), m_He, isFalling))/(m_caja + m_paraca_1 + m_paraca_2), ...
+    dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), w(1), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
 elseif (w(1)>0) & (R_globo(w(2))>=R_exp)    % Momento de explosión del globo
 
     % Cambiamos la referencia de la altitud del centro del globo al centro
     % del payload:
-    w(2) = w(2) - R_globo(w(2)) - l_c - L_z/2;
+    w(2) = w(2) - R_globo(w(2)) - l_caja_globo - L_z/2;
 
     % Guardamos instante y altitud en el que detectamos la explosión:
     t_exp = t;
     z_exp = w(2);
-    % save ../parametros t_exp z_exp % Versión para ejecutar desde la carpeta "Funciones"
-    save parametros t_exp z_exp % Versión para ejecutar desde el main.
+    % save ../parametros t_exp z_exp -append    % Versión para ejecutar desde la carpeta "Funciones"
+    save parametros t_exp z_exp -append     % Versión para ejecutar desde el main.
 
     isFalling = true;   % Pasamos de ascenso a descenso.
-    dw_dt = [(F_roz(w(2), w(1), isFalling) - F_g(w(2), w(1), m_He, isFalling))/(m_caja + m_paraca_1 + m_paraca_2), ...
+    dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), w(1), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
 else    % No deberíamos entrar aquí

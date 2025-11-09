@@ -2,7 +2,7 @@ function [T_k] = generar_T_k()
 
 load constantes.mat z_star P_k
 
-N=20;
+N=length(P_k);
 
 T_0=T_atm(z_star); 
 
