@@ -20,20 +20,19 @@
 %   r_globo(z)
 % ================================================================
 
-function F = F_g_caja(z, dz_dt, isFalling) 
-    
-    % Aceleración gravitatoria efectiva
-    g_eff = (G * M_T) ./ ( (R_T + z - r_globo(z) + l_c - L_z/2).^2 );
+function F = F_g_caja(z, m_He, isFalling) 
+
+load constantes.mat G M_T R_T M_caja L_z l_caja_globo
     
     % Distinción entre ascenso y descenso con el nuevo parámetro
     if isFalling
         %DESCENSO
        
-        F = m_caja * g_eff;
+        F = G *M_T * M_caja / ((R_T + z - L_z/2)*(R_T + z + L_z/2));
     else
         %ASCENSO
        
-        F = m_caja * g_eff;
+        F = G *M_T * M_caja / ((R_T + z - (R_globo(z, m_He) + l_caja_globo + L_z))*(R_T + z - (R_globo(z, m_He) + l_caja_globo));
     end
 
 end

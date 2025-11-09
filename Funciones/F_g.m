@@ -27,17 +27,27 @@
 
 function F = F_g(z, dz_dt, m_He, isFalling)
 
+load constantes.mat G M_T R_T M_paraca1 M_paraca2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo L_z
+
     %Caja: distingue ascenso/descenso
-    F_caja  = F_g_caja(z, dz_dt, isFalling);
+    F_caja  = F_g_caja(z, m_He, isFalling);
 
     %Globo: SIEMPRE se incluye (no distingue ascenso/descenso)
     F_globo = F_g_globo(z, dz_dt, m_He);
 
-    %Fuerza de los paracaídas
-    F_paraca1 = (G * M_T * m_paraca_1) ./ (R_T + z - r_globo(z) - l_1).^2;
-    F_paraca2 = (G * M_T * m_paraca_2) ./ (R_T + z - r_globo(z) - l_2).^2;
-
     %Fuerza total
-    F = F_caja + F_globo + F_paraca1 + F_paraca2;
+    if isFalling
+        %Fuerza de los paracaídas
+        F_paraca1 = (G * M_T * M_paraca1) ./ (R_T + z + L_z/2 + l_caja_paraca1).^2;
+        F_paraca2 = (G * M_T * M_paraca2) ./ (R_T + z + L_z/2 + l_caja_paraca1 + l_paraca1_paraca2).^2;
+
+        F = F_caja + F_paraca1 + F_paraca2;
+    else
+        %Fuerza de los paracaídas
+        F_paraca1 = (G * M_T * M_paraca1) ./ (R_T + z - r_globo(z) - (l_paraca1_paraca2 + l_paraca2_globo)).^2;
+        F_paraca2 = (G * M_T * M_paraca2) ./ (R_T + z - r_globo(z) - l_paraca2_globo).^2;
+
+        F = F_caja + F_globo + F_paraca1 + F_paraca2;
+    end
 end
 

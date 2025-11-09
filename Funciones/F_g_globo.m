@@ -17,10 +17,12 @@
 %   F      -> fuerza gravitatoria [N]
 %
 % Dependencias (definidas fuera de la función):
-%   G, M_T, R_T, m_latex
+%   G, M_T, R_T, M_globo
 % ================================================================
 
-function F = F_g_globo(z, dz_dt, m_He) 
+function F = F_g_globo(z, m_He)
+
+load constantes.mat G M_T R_T M_globo
  
-    F = (G * M_T * (m_He + m_latex)) ./ (R_T + z).^2;
+    F = (G * M_T * (m_He + M_globo)) ./ (R_T + z).^2;
 end
