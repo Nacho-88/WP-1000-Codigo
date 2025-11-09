@@ -28,37 +28,25 @@ R_T = 6371000;  % Radio de la Tierra medio (m)
 g_0 = 9.81;     % m / s^2
 P_0 = 101325;   % Pa
 
-z_star = 12000; % Límite para cambio de formula (m)
 
-R = 287.053;  % J/(kg·K)
+z_star = 12000;                    % Límite para cambio de formula (m)
 
-m_a = 0.0289644;        % kg/mol
+R = 287.053;                       % J/(kg·K)
 
-m_He_molar = 0.0040026;   % kg/mol
+m_a = 0.0289644;                   % kg/mol
 
+m_He_molar = 0.0040026;            % kg/mol
 
-% T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5]; % ºC
-% T_n = T_n + 273.15.*ones(size(T_n));        % K
-% z_n = 1e3 .* [0, 11, 20, 32, 47, 51, 71];   % m
-
-z_n_geop = [0, 11000, 20000, 32000, 47000, 51000, 71000];   % Vectores Altitud (geopotencial)
-
-T_n = [288, 216.5, 216.5, 228.5, 270.5, 270.5, 214.5];      % Temperatura (K)
-
-z_n_geom = (R_T .* z_n_geop) ./ (R_T - z_n_geop);           % Pasar de geopotencial a geometrica
+R_prima = (m_a / m_He_molar) * R;  % J/(kg*K)
 
 
-R_exp = 12; % m
+% Separación en capas del modelo
+z_n = [0, 11000, 20000, 32000, 47000, 51000, 71000];   % Altitudes (geopotenciales) (m)
 
-m_He = calcularMasaHelio(R_exp,z_exp);   % kg
+T_n = [288, 216.5, 216.5, 228.5, 270.5, 270.5, 214.5];      % Temperaturas (K)
 
-% r_globo=1;
-% c_d=0.75;
-dpar=1.64;
-m_atomicaHe=4;
-% Cd=0.3;
-v=5.33;
 
+% Coeficientes de arrastre (adimensionales)
 C_D_caja = 1.57439;   % Coeficiente de arrastre caja
 
 C_D_globo = 0.3;      % Coeficiente de arrastre globo
@@ -68,38 +56,59 @@ C_D_paraca_1 = 0.97;  % Coeficiente de paracaidas 1
 C_D_paraca_2 = 1.17;  % Coeficiente de paracaidas 2
 
 
-l_caja_globo = 37;         % Longitud (m) de la cuerda entre globo y payload
-
+% Distancias verticales (m)
 l_caja_paraca1  = 12.0;    % Caja – Paracaídas 1
 
 l_paraca1_paraca2 = 15.0;  % Paracaídas 1 – Paracaídas 2
 
 l_paraca2_globo = 10.0;    % Paracaídas 2 – Globo
 
+l_caja_globo = l_caja_paraca1 + l_paraca1_paraca2 + l_paraca2_globo;     % Longitud (m) de la cuerda entre globo y payload
 
-A_caja = 0.098;    % Area payload [m^2]
 
-A1 = 3.25;         % Area paracaidas 1
+% Dimensiones caja
+L_x = 0.35; % (m)
+L_y = 0.28; % (m)
+L_z = 0.28; % (m)
 
-A2 = 1.13;         % Area paracaidas 1
+A_caja = L_x * L_y;    % Área payload (m^2)
+
+A1 = 3.25;         % Área paracaidas 1 (m^2)
+
+A2 = 1.13;         % Área paracaidas 1 (m^2)
 
 
 M_caja = 2;        % Masa del payload (kg)
 
 M_globo = 2;       % Masa del globo (kg)
 
-M_paraca1 = 0.23;  % Masa paracaidas 1
+M_paraca1 = 0.23;  % Masa paracaídas 1 (kg)
 
-M_paraca2 = 0.08;   % Masa paracaidas 1
+M_paraca2 = 0.08;  % Masa paracaídas 2 (kg)
 
-% %Fórmula temperatura atmosférica
-% Tp = @(z) Tn + (z - zn) * (Tnp1 - Tn) / (znp1 - zn);
-% 
-% altitud_m = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40] * 1000;
-% temperatura_K = [15, 2, -10.98, -23.96, -36.93, -49.9, -56.5, -56.5, -56.5, -56.5, ...
-%                  -56.5, -54.5, -52.5, -50.5, -48.62, -46.64, -44.66, -39.41, -33.87, -28.33, -22.8] + 273.15;
 
-save constantes G R_T M_T g_0 P_0 T_n z_n
+save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n T_n C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 
+
+%% Parámetros variables
+
+R_exp = 12/2;                          % m
+z_exp_est = 36e3;                      % m
+
+
+ruta = addpath('Funciones');
+
+P_n = generar_P_n();	  % Pa
+
+m_He = calcularMasaHelio(R_exp, z_exp_est);   % kg
+
+
+P_k = generar_P_k();	  % Pa
+R_k = generar_R_k(m_He);  % m
+T_k = generar_T_k();      % K
+
+path(ruta);
+
+save constantes P_n P_k R_k T_k
 
 
 
@@ -164,6 +173,5 @@ clear ruta tf_add t_aux w_aux index z_aux
 
 
 %% Gráficas y datos importantes a comparar
-
 
 

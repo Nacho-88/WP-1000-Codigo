@@ -22,12 +22,12 @@ load constantes.mat T_n z_n R_T % Versión para ejecutar desde el main
 
 
 %% Inicio del código funcional
-n = 0;
+n = 1;
 
 for i=1:length(z_n)
 
     if z<z_n(i+1)*R_T/(R_T-z_n(i+1)) & z>=z_n(i)*R_T/(R_T-z_n(i))
-        n = i-1;  % Encontramos la capa buscada. (El índice 'i' está desplazado una unidad por encima porque MATLAB empieza en 1 en vez de en 0)
+        n = i;  % Encontramos la capa buscada.
         return  % Hemos terminado.
     end
 
