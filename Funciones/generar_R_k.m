@@ -2,7 +2,7 @@ function [R_k] = generar_R_k(m_He)
 
 load constantes.mat z_star P_k 
 
-N=20;
+N=length(P_k);
 
 R_k=zeros(1,N);
 

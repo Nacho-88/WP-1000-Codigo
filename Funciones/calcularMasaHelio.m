@@ -3,16 +3,16 @@ function M_He = calcularMasaHelio(R_exp, z_exp)
 termino_volumen = (4/3) * pi * (R_exp^3);
 
 % 2. Término del ratio de presión elevado al exponente
-n = n_capa(z_exp);
-[P_n] = generar_P_n();
-[P_k] = generar_P_k();
-Pm_zexp = P_k(n);
-P_np = P_n(n);
+n_exp = n_capa(z_exp);
+
+load constantes.mat P_n T_k z_star R_prima
+Pm_zexp = P(z_exp);
+P_np = P_n(n_exp);
 termino_presion = (Pm_zexp / P_np)^(3/5);
 
 % 3. Término del factor final
-[T_k] = generar_T_k() ;
-T_ref = T_k(n);
+n_star = n_capa(z_star);
+T_ref = T_k(n_exp-n_star);
 termino_factor = (P_np / (R_prima*T_ref));
 
 % --- Cálculo final ---

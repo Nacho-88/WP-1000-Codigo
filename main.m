@@ -98,19 +98,21 @@ z_exp_est = 36e3;                      % m
 
 ruta = addpath('Funciones');
 
-P_n = generar_P_n();	  % Pa
+P_n = generar_P_n();      % Pa
+save constantes.mat P_n -append
+
+P_k = generar_P_k();	  % Pa
+save constantes.mat P_k -append
+
+T_k = generar_T_k();      % K
+save constantes.mat T_k -append
 
 m_He = calcularMasaHelio(R_exp, z_exp_est);   % kg
 
-
-P_k = generar_P_k();	  % Pa
 R_k = generar_R_k(m_He);  % m
-T_k = generar_T_k();      % K
+save constantes.mat R_k m_He -append
 
 path(ruta);
-
-save constantes P_n P_k R_k T_k
-
 
 
 %% Resolución ecuación del movimiento
@@ -123,7 +125,11 @@ ruta = addpath('Funciones');
 dt = 60;        % s
 t0 = 0;         % s
 tf = 3*3600;    % s
-z0 = 0;         % m
+
+% Aproximamos el radio del globo en altitud inicial a la altitud de la
+% parte inferior del globo (pocos metro de diferencia y la presión a esa altitud varía poco)
+z0 = L_z + l_caja_globo + R_globo(L_z+l_caja_globo, m_He);    % m
+
 dz_dt0 = 0;     % m/s
 
 w0 = [dz_dt0, z0]';
@@ -159,7 +165,7 @@ load parametros.mat z_exp t_exp
 z_aux = z(1);
 index = 1;
 while (z_aux<z_exp)
-    z(index) = z(index) - R_globo(z(index)) - l_c;
+    z(index) = z(index) - R_globo(z(index)) - l_caja_globo - L_z/2;
     index = index + 1;
     z_aux = z(index);
 end
