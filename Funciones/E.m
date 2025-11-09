@@ -1,4 +1,4 @@
-function empuje = E(z, m_he)
+function empuje = E(z, m_He)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calcula la fuerza de empuje del globo que permite el ascenso a partir de la altitud (real/geométrica).
 % Entrada: z (altitud geometrica), m_he (amsa de Helio en kg)
@@ -8,12 +8,14 @@ function empuje = E(z, m_he)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Radio del globo
-R_g = R_globo(z, m_he);
+R_g = R_globo(z, m_He);
 
 if R_g <= 0
    empuje = 0;
+   warning('Radio de globo negativo, se toma como 0. (E)')
    return;
 end
+
 
 % Intervalos par para el método de Simpson
 N = 200;

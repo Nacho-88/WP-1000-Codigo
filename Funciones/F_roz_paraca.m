@@ -7,24 +7,14 @@ function F_paraca = F_roz_paraca(z, dz_dt)
 % Depende del Radio del globo (R_globo), Densidad atmosfera (rho_Atm) y Presión atmósfera (P)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Coeficientes de arrastre
-C_D_paraca_1 = 0.97;
-C_D_paraca_2 = 1.17;
-
-% Areas paracaidas
-A1 = 3.25;
-A2 = 1.13;
-
-% Longitud de cuerdas
-l_caja_paraca1  = 12.0;    % Caja – Paracaídas 1
-l_paraca1_paraca2 = 15.0;  % Paracaídas 1 – Paracaídas 2
-% l_paraca2_globo = 10.0;       % Paracaídas 2 – Globo
+% Llamar constantes
+load constantes C_D_paraca_1 C_D_paraca_2 A1 A2 l_caja_paraca1 l_paraca1_paraca2 Lz
 
 % Densidad de la atmosfera
-z_paraca1 = z + l_caja_paraca1;
+z_paraca1 = z + (Lz/2) + l_caja_paraca1;
 rho1 = rho_atm(z_paraca1);
 
-z_paraca2 = z + l_caja_paraca1 + l_paraca1_paraca2;
+z_paraca2 = z + (Lz/2) + l_caja_paraca1 + l_paraca1_paraca2;
 rho2 = rho_atm(z_paraca2);
 
 % Solo descenso

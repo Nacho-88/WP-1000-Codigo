@@ -1,4 +1,4 @@
-function F = F_roz_globo(z, dz_dt, m_he)
+function F = F_roz_globo(z, dz_dt, m_He)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calcula la la fuerza de rozamiento del globo a partir de la altitud (real) y su velocidad
 % Entrada: z (altitud geometrica), dz_dt (velocidad ascenso en m/s)
@@ -7,14 +7,15 @@ function F = F_roz_globo(z, dz_dt, m_he)
 % Depende del Radio del globo (R_globo) y Densidad atmosfera (rho_Atm), Presión atmósfera (P) y Integración (Método Simpson 1/3)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Coficiente de arrastre globo
-C_D_globo = 0.3;
+% Llamar constantes
+load constantes C_D_globo
 
 % Radio del globo
-R_z = R_globo(z, m_he);
+R_z = R_globo(z, m_He);
 
 if R_z <= 0
    F = 0;
+   warning('Radio de globo negativo, se toma como 0. (F_roz_globo)')
    return;
 end
 

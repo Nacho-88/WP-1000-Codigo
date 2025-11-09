@@ -40,11 +40,9 @@ m_He_molar = 0.0040026;            % kg/mol
 R_prima = (m_a / m_He_molar) * R;  % J/(kg*K)
 
 
-z_n_geop = [0, 11000, 20000, 32000, 47000, 51000, 71000];   % Vectores Altitud (geopotencial)
+z_n = [0, 11000, 20000, 32000, 47000, 51000, 71000];   % Vectores Altitud (geopotencial)
 
 T_n = [288, 216.5, 216.5, 228.5, 270.5, 270.5, 214.5];      % Temperatura (K)
-
-z_n_geom = (R_T .* z_n_geop) ./ (R_T - z_n_geop);           % Pasar de geopotencial a geometrica
 
 
 C_D_caja = 1.57439;   % Coeficiente de arrastre caja
@@ -64,8 +62,11 @@ l_paraca2_globo = 10.0;    % Paracaídas 2 – Globo
 
 l_caja_globo = l_caja_paraca1 + l_paraca1_paraca2 + l_paraca_globo;     % Longitud (m) de la cuerda entre globo y payload
 
+L_x = 0.35; % (m)
+L_y = 0.28; % (m)
+L_z = 0.28; % (m)
 
-A_caja = 0.098;    % Area payload [m^2]
+A_caja = L_x * L_y;    % Area payload (m^2)
 
 A1 = 3.25;         % Area paracaidas 1 (m^2)
 
@@ -78,21 +79,26 @@ M_globo = 2;       % Masa del globo (kg)
 
 M_paraca1 = 0.23;  % Masa paracaidas 1 (kg)
 
-M_paraca2 = 0.08;   % Masa paracaidas 2 (kg)
+M_paraca2 = 0.08;  % Masa paracaidas 2 (kg)
 
 
-P_n = generar_P_n();	% Pa
-P_k = generar_P_k();	% Pa
-R_k = generar_R_k();	% m
+save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n T_n z_n_geom C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 
 
+%% Parámetros variables
 
-save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n_geop T_n z_n_geom C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 P_n P_k R_k
-
-R_exp = 12/2;      % m
-
-z_exp_est = 36e3;  % m
-
+R_exp = 12/2;                          % m
+z_exp_est = 36e3;                      % m
 m_He = masa_Helio(R_exp, z_exp_est);   % kg
+
+
+P_n = generar_P_n();	  % Pa
+P_k = generar_P_k();	  % Pa
+R_k = generar_R_k(m_He);  % m
+T_k = generar_T_k();      % K
+
+save constantes P_n P_k R_k T_k
+
+
 
 %% Resolución ecuación del movimiento
 

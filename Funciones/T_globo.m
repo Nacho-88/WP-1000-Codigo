@@ -7,25 +7,14 @@ function T = T_globo(z)
 % Depende de T_atm(z) y P(z)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Constantes
-R_T= 6371000;   % Radio de la Tierra medio (m)
-z_star = 12000; % Límite para cambio de formula (m)
-
-% Vector Altitud (geopotencial)
-z_n_geop = [0, 11000, 20000, 32000, 47000, 51000, 71000];
-
-% Pasar de geopotencial a geometrica
-z_n_geom = (R_T .* z_n_geop) ./ (R_T - z_n_geop);
+% Llamar constantes
+load constantes z_n T_k z_star P_k
 
 % Determinar la capa (n*)
 n_star = n_capa(z);
 
 % Definir los tramos del ascenso
-z_star_frontera = [z_star, z_n_geom(n_star+1:end)];
-
-% Llamar P_k y T_k
-P_k = generar_P_k();
-T_k = generar_T_k(P_k);
+z_star_frontera = [z_star, z_n(n_star+1:end)];
 
 % Zona Baja
 if z <= z_star
