@@ -127,7 +127,7 @@ ruta = addpath('Funciones');
 % aceleraciones serán pequeñas.
 
 % Definición condiciones iniciales y parámetros para Runge-Kutta:
-dt = 1;         % s
+dt = 1.05;         % s
 t0 = 0;         % s
 tf = 3*3600;    % s
 
@@ -142,7 +142,8 @@ w0 = [dz_dt0, z0]';
 f = @(t, w) ec_mov(t, w, m_He, R_exp);
 
 % Uso Runge-Kutta para la resolución del sistema de ecuaciones diferenciales
-[t, w] = Metodo_RK4(dt, t0, tf, f, w0);
+% [t, w] = Metodo_RK4(dt, t0, tf, f, w0);
+[t, w] = ode45(f, [t0 tf], w0, odeset(RelTol=1e-5,AbsTol=1e-7));
 
 
 % Desglose de la matriz devuelta por RK en velocidades y altitudes (vectores fila)

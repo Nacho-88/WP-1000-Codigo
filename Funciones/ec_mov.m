@@ -56,11 +56,11 @@ elseif (w(1)<=0 & t>0)  % Si dz_dt=0 necesitamos que t>0 para estar en el
     dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...
             w(1)]';
 
-elseif (w(1)>0) & (R_globo(w(2))>=R_exp)    % Momento de explosión del globo
+elseif (w(1)>0) & (R_globo(w(2),m_He)>=R_exp)    % Momento de explosión del globo
 
     % Cambiamos la referencia de la altitud del centro del globo al centro
     % del payload:
-    w(2) = w(2) - R_globo(w(2)) - l_caja_globo - L_z/2;
+    w(2) = w(2) - R_globo(w(2),m_He) - l_caja_globo - L_z/2;
 
     % Guardamos instante y altitud en el que detectamos la explosión:
     t_exp = t;
