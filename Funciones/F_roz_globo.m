@@ -20,12 +20,12 @@ if R_z <= 0
 end
 
 % Intervalos par para el método de Simpson
-N = 200;
-
-if mod(N,2) ~= 0
-   N = N + 1;
-end
-
+% N = 200;
+% 
+% if mod(N,2) ~= 0
+%    N = N + 1;
+% end
+% 
 % % Integración
 % a = 0;
 % b = R_z;

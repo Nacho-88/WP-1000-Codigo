@@ -13,6 +13,8 @@ function [n] = n_capa(z)
 %% Comprobación valores de inputs:
 if z<0
     warning("Error en el parámetro de la función 'n_capa': la altitud debe ser positiva.")
+    n = 1;
+    return
 end
 
 

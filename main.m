@@ -92,8 +92,8 @@ save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n T_n C_
 
 %% Parámetros variables
 
-R_exp = 12/2;                          % m
-z_exp_est = 36e3;                      % m
+R_exp = 12.4/2;                          % m
+z_exp_est = 37550;                  % m
 
 
 ruta = addpath('Funciones');
@@ -101,16 +101,16 @@ ruta = addpath('Funciones');
 P_n = generar_P_n();      % Pa
 save constantes.mat P_n -append
 
-P_k = generar_P_k();	  % Pa
-save constantes.mat P_k -append
-
-T_k = generar_T_k();      % K
-save constantes.mat T_k -append
+% P_k = generar_P_k();	  % Pa
+% save constantes.mat P_k -append
+% 
+% T_k = generar_T_k();      % K
+% save constantes.mat T_k -append
 
 m_He = calcularMasaHelio(R_exp, z_exp_est);   % kg
 
-R_k = generar_R_k(m_He);  % m
-save constantes.mat R_k m_He -append
+% R_k = generar_R_k(m_He);  % m
+% save constantes.mat R_k m_He -append
 
 path(ruta);
 
@@ -129,7 +129,7 @@ ruta = addpath('Funciones');
 % Definición condiciones iniciales y parámetros para Runge-Kutta:
 dt = 1.05;         % s
 t0 = 0;         % s
-tf = 3*3600;    % s
+tf = 4*3600;    % s
 
 % Aproximamos el radio del globo en altitud inicial a la altitud de la
 % parte inferior del globo (pocos metro de diferencia y la presión a esa altitud varía poco)
@@ -147,23 +147,24 @@ f = @(t, w) ec_mov(t, w, m_He, R_exp);
 
 
 % Desglose de la matriz devuelta por RK en velocidades y altitudes (vectores fila)
-dz_dt = w(1,:); % m/s
-z = w(2,:);     % m
+dz_dt = w(:,1); % m/s
+z = w(:,2);     % m
 
 
 % Si no hemos alcanzado altitud 0 (o próxima a 0) continuamos un tiempo
 % extra hasta alcanzarlo:
 if z(end)>(L_z/2)
-    tf_add = 3600; % Tiempo añadido (en segundos) para alcanzar altitud 0
-    [t_aux, w_aux] = Metodo_RK4(dt, tf, tf+tf_add, f, w(:,end));
+    w0_aux = [dz_dt(end), z(end)]';
+    tf_add = tf + 3600; % Tiempo añadido (en segundos) para alcanzar altitud 0
+    [t_aux, w_aux] = ode45(f, [tf tf_add], w0_aux, odeset(RelTol=1e-5,AbsTol=1e-7));
     
     % Añadimos los nuevos valores de tiempos y el vector de estados.
     t = [t, t_aux(2:end)];
-    w = [w(1,:), w_aux(1,:); w(2,:), w_aux(2,:)];
+    w = [w(:,1), w_aux(:,1); w(:,2), w_aux(:,2)];
 
     % Desglose de la matriz
-    dz_dt = w(1,:);
-    z = w(2,:);
+    dz_dt = w(:,1);
+    z = w(:,2);
 end
 
 
@@ -172,7 +173,7 @@ load parametros.mat z_exp t_exp
 z_aux = z(1);
 index = 1;
 while (z_aux<z_exp)
-    z(index) = z(index) - R_globo(z(index)) - l_caja_globo - L_z/2;
+    z(index) = z(index) - R_globo(z(index), m_He) - l_caja_globo - L_z/2;
     index = index + 1;
     z_aux = z(index);
 end
@@ -187,5 +188,15 @@ clear ruta tf_add t_aux w_aux index z_aux
 
 
 %% Gráficas y datos importantes a comparar
+figure(1)
+plot(t, z);
+title('Perfil de ascenso y descenso')
+xlabel('tiempo (s)')
+ylabel('altura (m)')
 
+figure(2)
+plot(t,dz_dt)
+title('Perfil de velocidades')
+xlabel('tiempo (s)')
+ylabel('velocidad (m/s)')
 
