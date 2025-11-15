@@ -26,7 +26,7 @@ load constantes.mat T_n z_n R_T % Versión para ejecutar desde el main
 %% Inicio del código funcional
 n = 1;
 
-for i=1:length(z_n)
+for i=1:length(z_n)-1
 
     if z<z_n(i+1)*R_T/(R_T-z_n(i+1)) & z>=z_n(i)*R_T/(R_T-z_n(i))
         n = i;  % Encontramos la capa buscada.

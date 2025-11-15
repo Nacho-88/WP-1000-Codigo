@@ -1,0 +1,17 @@
+function [P_b, Free_Lift] = llenado(m_He, R_0)
+
+load constantes.mat R_prima L_z l_caja_globo
+
+P_b0 = 200*10^5;    % Pa
+V_b = 50*10^-3;     % m^3
+
+tz = T_atm(1026 + L_z + l_caja_globo + R_0);
+
+P_b = (P_b0 - m_He*R_prima*tz/V_b)*10^(-5);     % bar
+
+Emp = E((1026), m_He);
+F_g = F_g_globo((1026), m_He);
+
+Free_Lift = Emp - F_g;
+
+end
