@@ -1,4 +1,4 @@
-function F_caja = F_roz_caja(z, dz_dt, m_He,isFalling)
+function F_caja = F_roz_caja(z, dz_dt, m_He, isFalling)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Calcula la fuerza de rozamiento del payload a partir de la altitud (real) y la velocidad de ascenso o descenso
 % Entrada: z (altitud geometrica), m_he (amsa de Helio en kg), dz_dt (velocidad ascenso/descenso en m/s)
@@ -19,7 +19,7 @@ if ~isFalling
     signo_velo = +1;
 else
     z_caja = z+(L_z/2);
-    signo_velo = -1;
+    signo_velo = sign(dz_dt);
 end
 
 rho = rho_atm(z_caja);

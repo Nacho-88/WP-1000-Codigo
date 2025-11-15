@@ -62,11 +62,23 @@ elseif (w(1)>0) & (R_globo(w(2),m_He)>=R_exp)    % Momento de explosión del glo
     % del payload:
     w(2) = w(2) - R_globo(w(2),m_He) - l_caja_globo - L_z/2;
 
-    % Guardamos instante y altitud en el que detectamos la explosión:
-    t_exp = t;
-    z_exp = w(2);
-    % save ../parametros t_exp z_exp -append    % Versión para ejecutar desde la carpeta "Funciones"
-    save parametros t_exp z_exp -append     % Versión para ejecutar desde el main.
+    % Guardamos instante y altitud en el que detectamos la explosión. Como
+    % podemos estar en varios instantes de tiempo en la transición,
+    % guardamos todos los tiempos en los que nos encontramos en esta
+    % situación, de tal forma que el primero corresponde con el tiempo de
+    % explosión.
+    load parametros.mat t_exp z_exp
+    
+    if ~exist("t_exp","var")
+        t_exp = t;
+        save parametros.mat t_exp -append
+    end
+
+    if ~exist("z_exp","var")
+        z_exp = w(2);
+        save parametros.mat z_exp -append
+    end
+    
 
     isFalling = true;   % Pasamos de ascenso a descenso.
     dw_dt = [(F_roz(w(2), w(1), m_He, isFalling) - F_g(w(2), m_He, isFalling))/(M_caja + M_paraca1 + M_paraca2), ...

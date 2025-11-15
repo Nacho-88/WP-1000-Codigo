@@ -17,8 +17,7 @@
 %masa total M
 %masa paracaidas m_paracaidas
 %coeficiente de arrastre c_d=0.75 d=1.64m (paracaidas)
-%Tglobo 1 es igual a la atm hasta 12 km y luego Tglobo 2 varía a partir de
-%esa altitud
+%Tglobo 1 es igual a la atm 
 %radio globo= r_globo
 
 %% Constantes
@@ -28,8 +27,6 @@ R_T = 6371000;  % Radio de la Tierra medio (m)
 g_0 = 9.80665;  % m / s^2
 P_0 = 101325;   % Pa
 
-
-z_star = 12000;                    % Límite para cambio de formula (m)
 
 R = 287.053;                       % J/(kg·K)
 
@@ -88,14 +85,14 @@ M_paraca1 = 0.23;  % Masa paracaídas 1 (kg)
 M_paraca2 = 0.08;  % Masa paracaídas 2 (kg)
 
 
-save constantes G M_T R_T g_0 P_0 T_n z_star R m_a m_He_molar R_prima z_n T_n C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo L_x L_y L_z A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 
+save constantes G M_T R_T g_0 P_0 T_n R m_a m_He_molar R_prima z_n T_n C_D_caja C_D_globo C_D_paraca_1 C_D_paraca_2 l_caja_paraca1 l_paraca1_paraca2 l_paraca2_globo l_caja_globo L_x L_y L_z A_caja A1 A2 M_caja M_globo M_paraca1 M_paraca2 
 
 %% Parámetros variables
 
 R_exp = 12.4/2;                          % m
 z_exp_est = 37550;                       % m
-R_0 = 2.25/2;                              % m
-validacion = true;                       % buleano para elegir la forma de calcular la masa de helio
+R_0 = 2.25/2;                            % m
+validacion = true;                       % booleano para elegir la forma de calcular la masa de helio
 
 
 ruta = addpath('Funciones');
@@ -103,18 +100,11 @@ ruta = addpath('Funciones');
 P_n = generar_P_n();      % Pa
 save constantes.mat P_n -append
 
-% P_k = generar_P_k();	  % Pa
-% save constantes.mat P_k -append
-% 
-% T_k = generar_T_k();      % K
-% save constantes.mat T_k -append
 
 m_He = calcularMasaHelio(R_exp, R_0, z_exp_est, validacion);   % kg
 
 [P_b, Free_Lift] = llenado(m_He, R_0);  % P_b [bar]     Free_Lift [N]
 
-% R_k = generar_R_k(m_He);  % m
-% save constantes.mat R_k m_He -append
 
 path(ruta);
 
@@ -124,16 +114,22 @@ path(ruta);
 % Cambio de la ruta de búsqueda para poder buscar en la carpeta de funciones.
 ruta = addpath('Funciones');
 
-% Dado que se empieza con velocidad 0, el rozamiento no se tiene en cuenta
-% en el primer cálculo, esto da una aceleración muy elevada que debería
-% durar poco tiempo, por lo que vamos a considerar un paso pequeño para los
-% primeros 15 puntos y después aumentaremos el paso ya que las
-% aceleraciones serán pequeñas.
+% En caso de haber ejecutado previamente el código, tenemos que eliminar
+% las variables t_exp y z_exp del archivo parametros.mat para poder
+% detectar correctamente el instante de explosión en la próxima simulación.
+S = load('parametros.mat');
+if isfield(S,'t_exp') | isfield(S, 'z_exp')
+    S = rmfield(S, "z_exp");
+    S = rmfield(S, "t_exp");
+    save("parametros.mat", "-struct", "S")
+end
+clear S
+
 
 % Definición condiciones iniciales y parámetros para Runge-Kutta:
-% dt = 1.05;         % s
+% dt = 1.05;    % s
 t0 = 0;         % s
-tf = 3.5*3600;    % s
+tf = 3*3600;    % s
 
 % Aproximamos el radio del globo en altitud inicial a la altitud de la
 % parte inferior del globo (pocos metro de diferencia y la presión a esa altitud varía poco)
@@ -157,41 +153,49 @@ z = w(:,2);     % m
 
 % Si no hemos alcanzado altitud 0 (o próxima a 0) continuamos un tiempo
 % extra hasta alcanzarlo:
-if z(end)>(L_z/2)
+while z(end)>(L_z/2)
+
     w0_aux = [dz_dt(end), z(end)]';
-    tf_add = tf + 3600; % Tiempo añadido (en segundos) para alcanzar altitud 0
-    [t_aux, w_aux] = ode45(f, [tf tf_add], w0_aux, odeset(RelTol=1e-7,AbsTol=1e-9));
-    
+    t0_aux = tf;
+    tf = tf + 900; % Tiempo añadido (en segundos) para alcanzar altitud 0
+    [t_aux, w_aux] = ode45(f, [t0_aux tf], w0_aux, odeset(RelTol=1e-7,AbsTol=1e-9));
+
     % Añadimos los nuevos valores de tiempos y el vector de estados.
-    t = [t, t_aux(2:end)];
-    w = [w(:,1), w_aux(:,1); w(:,2), w_aux(:,2)];
+    t = [t; t_aux(2:end)];
 
     % Desglose de la matriz
-    dz_dt = w(:,1);
-    z = w(:,2);
+    dz_dt = [dz_dt; w_aux(:,1)];
+    z = [z; w_aux(:,2)];
+
+    w = [dz_dt, z];
+
 end
 
+
 % Eliminamos los elementos con una altura negativa
-z=z(z>=0);
+z = z(1:length(z(z>=0))+1);
+% Interpolamos linealmente para saber el instante de tiempo en el que se
+% llega a z=0.
+t(length(z)) = t(length(z)-1) + (t(length(z))-t(length(z)-1))*(0-z(end-1))/(z(end)-z(end-1));
+z(end) = 0;
 dz_dt(length(z)+1:end) = [];
 t(length(z)+1:end) = [];
 
 % Desplazamiento de la altitud para que corresponda al payload en vez del globo:
 load parametros.mat z_exp t_exp
-z_aux = z(1);
+t_aux = t(1);
 index = 1;
-while (z_aux<z_exp)
+while (t_aux<t_exp)
     z(index) = z(index) - R_globo(z(index), m_He) - l_caja_globo - L_z/2;
     index = index + 1;
-    z_aux = z(index);
+    t_aux = t(index);
 end
 
 save parametros z dz_dt t -append   % Guardamos los parámetros calculados.
 
-what
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
 path(ruta)
-clear ruta tf_add t_aux w_aux index z_aux
+clear ruta tf_add t_aux w_aux index z_aux t0_aux
 
 
 
