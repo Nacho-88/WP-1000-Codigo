@@ -76,7 +76,7 @@ A1 = 3.25;         % Área paracaidas 1 (m^2)
 A2 = 1.13;         % Área paracaidas 1 (m^2)
 
 
-M_caja = 2.460;        % Masa del payload (kg)
+M_caja = 2.200;        % Masa del payload (kg)
 
 M_globo = 2;       % Masa del globo (kg)
 
@@ -91,7 +91,7 @@ save constantes G M_T R_T g_0 P_0 T_n R m_a m_He_molar R_prima z_n T_n C_D_caja 
 
 R_exp = 12.4/2;                          % m
 z_exp_est = 37550;                       % m
-R_0 = 2.25/2;                            % m
+R_0 = 2.4/2;                            % m
 validacion = true;                       % booleano para elegir la forma de calcular la masa de helio
 
 
@@ -103,7 +103,7 @@ save constantes.mat P_n -append
 
 m_He = calcularMasaHelio(R_exp, R_0, z_exp_est, validacion);   % kg
 
-[P_b, Free_Lift] = llenado(m_He, R_0);  % P_b [bar]     Free_Lift [N]
+[P_b, delta_P, Nozzle_Lift] = llenado(m_He, R_0);  % P_b [bar]     Nozzle_Lift [N]
 
 
 path(ruta);
@@ -143,7 +143,7 @@ f = @(t, w) ec_mov(t, w, m_He, R_exp);
 
 % Uso Runge-Kutta para la resolución del sistema de ecuaciones diferenciales
 % [t, w] = Metodo_RK4(dt, t0, tf, f, w0);
-[t, w] = ode45(f, [t0 tf], w0, odeset(RelTol=1e-7,AbsTol=1e-9));
+[t, w] = ode45(f, [t0 tf], w0, odeset(RelTol=1e-5,AbsTol=1e-7));
 
 
 % Desglose de la matriz devuelta por RK en velocidades y altitudes (vectores fila)
@@ -192,6 +192,9 @@ while (t_aux<t_exp)
 end
 
 save parametros z dz_dt t -append   % Guardamos los parámetros calculados.
+
+% Hay que cambiar el archivo en función del vuelo que se esté simulando
+save Funciones\vuelo_n6.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
 
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
 path(ruta)
