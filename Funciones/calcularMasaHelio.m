@@ -1,4 +1,4 @@
-function M_He = calcularMasaHelio(R_exp, R_0, z_exp, validacion)
+function M_He = calcularMasaHelio(R_exp, R_0, z_exp, T_amb, P_amb, validacion)
 % % 1. Término del Volumen (4/3 * pi * R^3)
 % termino_volumen = (4/3) * pi * (R_exp^3);
 % 
@@ -24,7 +24,8 @@ load constantes.mat R R_prima L_z l_caja_globo
 if validacion
     % Obtener la masa a partir de unas condiciones iniciales
     volumen = (4/3) * pi * (R_0^3);
-    densidad = (R/R_prima) * rho_atm(1026 + L_z + l_caja_globo + R_0);
+    % densidad = (R/R_prima) * rho_atm(1026 + L_z + l_caja_globo + R_0);
+    densidad = P_amb / (2077*(T_amb+273.15));
 else
     % Obtener la masa necesaria para alcanzar una cierta altura
     volumen = (4/3) * pi * (R_exp^3);
