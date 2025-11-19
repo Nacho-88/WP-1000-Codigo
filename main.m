@@ -38,9 +38,10 @@ R_prima = (m_a / m_He_molar) * R;  % J/(kg*K)
 
 
 % Separación en capas del modelo
-z_n = [0, 11000, 20000, 32000, 47000, 51000, 71000];    % Altitudes (geopotenciales) (m)
+% La última capa se extiende artificialmente para que no haya errores en los pasos intermedios del ode45
+z_n = [0, 11000, 20000, 32000, 47000, 51000, 71000, 170000];    % Altitudes (geopotenciales) (m)
 
-T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5];     % Temperaturas (ºC)
+T_n = [15, -56.5, -56.5, -44.5, -2.5, -2.5, -58.5, -256,5];     % Temperaturas (ºC)
 T_n = T_n + 273.15*ones(size(T_n));                     % Temperaturas (K)
 
 
@@ -76,7 +77,7 @@ A1 = 3.25;         % Área paracaidas 1 (m^2)
 A2 = 1.13;         % Área paracaidas 1 (m^2)
 
 
-M_caja = 2.460;        % Masa del payload (kg)
+M_caja = 2.263;    % Masa del payload (kg)
 
 M_globo = 2;       % Masa del globo (kg)
 
@@ -91,8 +92,8 @@ save constantes G M_T R_T g_0 P_0 T_n R m_a m_He_molar R_prima z_n T_n C_D_caja 
 
 R_exp = 12.4/2;                          % m
 z_exp_est = 37550;                       % m
-R_0 = 2.25/2;                            % m
-T_amb = 18 + 273.15;                     % K
+R_0 = 2.5/2;                             % m
+T_amb = 18;                              % ºC
 P_amb = 89876;                           % Pa
 validacion = true;                       % booleano para elegir la forma de calcular la masa de helio
 
@@ -103,9 +104,9 @@ P_n = generar_P_n();      % Pa
 save constantes.mat P_n -append
 
 
-m_He = calcularMasaHelio(R_exp, R_0, z_exp_est, validacion);   % kg
+m_He = calcularMasaHelio(R_exp, R_0, z_exp_est, T_amb, P_amb, validacion);   % kg
 
-[P_b, delta_P, Nozzle_Lift] = llenado(m_He, R_0);  % P_b [bar]     Nozzle_Lift [N]
+[P_b, delta_P, Nozzle_Lift] = llenado(m_He, R_0, T_amb);  % P_b [bar]     Nozzle_Lift [N]
 
 
 path(ruta);
@@ -196,7 +197,7 @@ end
 save parametros z dz_dt t -append   % Guardamos los parámetros calculados.
 
 % Hay que cambiar el archivo en función del vuelo que se esté simulando
-save Funciones\vuelo_n12+1.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
+save Funciones\vuelo_n10.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
 
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
 path(ruta)
