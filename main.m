@@ -205,16 +205,155 @@ clear ruta tf_add t_aux w_aux index z_aux t0_aux
 
 
 
-%% Gráficas y datos importantes a comparar
+%% =================================================================
+% ANÁLISIS DE DATOS Y CÁLCULOS PRELIMINARES
+% =================================================================
+% Variables de entrada asumidas: 't' (tiempo), 'z' (altitud) y 'dz_dt' (velocidad).
+z0 = z(1); % Altitud inicial del sistema.
+
+%% CÁLCULO DEL TIEMPO TOTAL DE VUELO
+t_total = t(end); % Tiempo total del vuelo en segundos.
+% Conversión del tiempo total a formato H:M:S para visualización.
+H_total = floor(t_total / 3600);
+M_total = floor(mod(t_total, 3600) / 60);
+S_total = mod(t_total, 60);
+t_str_total = sprintf('%02d h,%02d min, %05.2f s', H_total, M_total, S_total);
+
+%% =================================================================
+% GRÁFICAS DE VUELO
+% =================================================================
+
+% --- Gráfica 1: Altitud vs. Tiempo (Perfil de Vuelo) ---
 figure(1)
 plot(t, z);
-title('Perfil de ascenso y descenso')
+hold on
+grid on
+
+% Cálculo del punto máximo (Altitud y Tiempo).
+[z_max, idx_max] = max(z);
+t_max = t(idx_max);
+
+% Conversión del tiempo máximo (t_max) a formato H:M:S para la etiqueta.
+H = floor(t_max / 3600);
+M = floor(mod(t_max, 3600) / 60);
+S = mod(t_max, 60);
+t_str = sprintf('%02d h,%02d min, %05.2f s', H, M, S);
+
+% Marcar el punto de altitud máxima y añadir una etiqueta informativa.
+plot(t_max, z_max, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
+text(t_max, z_max, ...
+    ['  Máximo (', t_str, ' y ', num2str(z_max, '%.0f'), ' m)'], ...
+    'VerticalAlignment', 'bottom', ...
+    'HorizontalAlignment', 'left', ...
+    'FontWeight', 'bold', ...
+    'FontSize', 10);
+
+title('Perfil de Ascenso y Descenso')
 xlabel('tiempo (s)')
 ylabel('altura (m)')
+ax = gca;
+ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
+hold off
 
+% --- Gráfica 2: Velocidad vs. Tiempo (Perfil de Velocidades) ---
 figure(2)
-plot(t,dz_dt)
-title('Perfil de velocidades')
+plot(t, dz_dt)
+title('Perfil de Velocidades')
 xlabel('tiempo (s)')
 ylabel('velocidad (m/s)')
+grid on
+hold off
+
+%% =================================================================
+% CÁLCULOS ADICIONALES (Duración de Caída y Velocidades Medias)
+% =================================================================
+
+% --- Tarea 1: Duración de la caída del payload ---
+% Buscar el índice en la fase de descenso (t > t_max) donde la altitud es más cercana a z0.
+idx_recovery_candidates = find(t > t_max);
+[~, idx_temp] = min(abs(z(idx_recovery_candidates) - z0));
+idx_recovery = idx_recovery_candidates(idx_temp);
+t_recovery = t(idx_recovery);
+z_recovery = z(idx_recovery); % Altura de recuperación real.
+
+% CÁLCULO DE LA DURACIÓN DE LA CAÍDA: Tiempo de recuperación - Tiempo en el máximo.
+t_fall_duration = t_recovery - t_max;
+
+% Conversión de la duración de caída a formato H:M:S.
+H_fall = floor(t_fall_duration / 3600);
+M_fall = floor(mod(t_fall_duration, 3600) / 60);
+S_fall = mod(t_fall_duration, 60);
+t_str_fall = sprintf('%02d h,%02d min, %05.2f s', H_fall, M_fall, S_fall);
+
+% --- Tarea 2: Velocidades medias de ascenso ---
+t_ascend = t(1:idx_max); % Datos de tiempo durante el ascenso.
+z_ascend = z(1:idx_max); % Datos de altitud durante el ascenso.
+
+% 1. Velocidad media de ascenso simple (Altura Máxima / Tiempo Máximo).
+v_avg_simple = z_max / t_max;
+
+% 2. Velocidad media de ascenso por ajuste lineal (Mínimos Cuadrados).
+P_fit = polyfit(t_ascend, z_ascend, 1);
+v_avg_fit = P_fit(1); % El coeficiente P(1) es la pendiente (velocidad).
+
+% IMPRESIÓN DE RESULTADOS
+fprintf('\n--- Resultados de Datos y Velocidad ---\n');
+fprintf('Altitud inicial: %.2f m\n', z0);
+fprintf('Tiempo de explosión del globo (Máximo): %s\n', t_str);
+fprintf('Altitud máxima alcanzada: %.2f m\n', z_max);
+fprintf('-------------------------------------------\n');
+fprintf('Tiempo total del vuelo (final de los datos): %s\n', t_str_total);
+fprintf('Duración de la caída del payload (desde Máximo hasta %.2f m): %s\n', z_recovery, t_str_fall);
+fprintf('-------------------------------------------\n');
+fprintf('Velocidad media de ascenso (simple): %.4f m/s\n', v_avg_simple);
+fprintf('Velocidad media de ascenso (ajuste lineal): %.4f m/s\n', v_avg_fit);
+
+
+%% =================================================================
+% TAREA 3: MODELADO DEL DESCENSO CON AJUSTES FUNCIONALES
+% =================================================================
+
+% Datos de la fase de descenso (desde t_max hasta el final).
+t_descent = t(idx_max:end);
+z_descent = z(idx_max:end);
+% Normalizar el tiempo para que t'=0 en el punto máximo.
+t_prime_descent = t_descent - t_descent(1);
+
+% 1. Ajuste Polinomial (Grado 3).
+[P_poly3, ~, MU_poly] = polyfit(t_prime_descent, z_descent, 3);
+% Evaluar el polinomio usando los parámetros de normalización (MU) para mayor estabilidad.
+z_fit_poly3 = polyval(P_poly3, t_prime_descent, [], MU_poly);
+
+% 2. Ajuste Exponencial (Aproximación lineal sobre el logaritmo).
+z_final = z(end);
+z_diff = z_descent - z_final;
+% Evitar log(0): reemplazar valores no positivos con un número muy pequeño (eps).
+z_diff(z_diff <= 0) = eps;
+
+% Ajuste lineal (Grado 1) sobre log(z - z_final) vs. t'.
+[P_exp, ~, MU_exp] = polyfit(t_prime_descent, log(z_diff), 1);
+
+% Calcular los coeficientes c1 y c2 para el modelo exponencial z = z_final + exp(c1 + c2 * t').
+c2_exp = P_exp(1) / MU_exp(2);      % c2 (pendiente)
+c1_exp = P_exp(2) - c2_exp * MU_exp(1); % c1 (intercepto)
+
+% Evaluar el modelo exponencial.
+z_fit_exp = z_final + exp(c1_exp + c2_exp * t_prime_descent);
+
+% --- Gráfica 3: Altitud en el Descenso con Ajustes ---
+figure(3)
+plot(t_descent, z_descent, 'b.', 'MarkerSize', 8);
+hold on
+plot(t_descent, z_fit_poly3, 'r-', 'LineWidth', 2);
+plot(t_descent, z_fit_exp, 'g--', 'LineWidth', 2);
+hold off
+
+title('Altitud durante el Descenso con Ajustes (Polinomial y Exponencial)')
+xlabel('tiempo (s)')
+ylabel('altura (m)')
+legend('Datos de Descenso', 'Ajuste Polinomial (Grado 3)', 'Ajuste Exponencial', 'Location', 'best')
+grid on
+ax = gca;
+ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
+
 
