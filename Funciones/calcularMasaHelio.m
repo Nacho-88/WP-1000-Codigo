@@ -4,7 +4,7 @@ load constantes.mat R R_prima
 if validacion
     % Obtener la masa a partir de unas condiciones iniciales
     volumen = (4/3) * pi * (R_0^3);
-    densidad = P_amb / (2077*(T_amb+273.15));
+    densidad = P_amb / (R_prima*(T_amb+273.15));
 else
     % Obtener la masa necesaria para alcanzar una cierta altura
     volumen = (4/3) * pi * (R_exp^3);
