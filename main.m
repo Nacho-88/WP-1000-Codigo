@@ -239,6 +239,12 @@ M = floor(mod(t_max, 3600) / 60);
 S = mod(t_max, 60);
 t_str = sprintf('%02d h,%02d min, %05.2f s', H, M, S);
 
+% Conversión del tiempo de explosiòn (t_max) a formato H:M:S para la etiqueta.
+H = floor(t_exp / 3600);
+M = floor(mod(t_exp, 3600) / 60);
+S = mod(t_exp, 60);
+t_exp_str = sprintf('%02d h,%02d min, %05.2f s', H, M, S);
+
 % Marcar el punto de altitud máxima y añadir una etiqueta informativa.
 plot(t_max, z_max, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
 text(t_max, z_max, ...
@@ -269,15 +275,8 @@ hold off
 % =================================================================
 
 % --- Tarea 1: Duración de la caída del payload ---
-% Buscar el índice en la fase de descenso (t > t_max) donde la altitud es más cercana a z0.
-idx_recovery_candidates = find(t > t_max);
-[~, idx_temp] = min(abs(z(idx_recovery_candidates) - z0));
-idx_recovery = idx_recovery_candidates(idx_temp);
-t_recovery = t(idx_recovery);
-z_recovery = z(idx_recovery); % Altura de recuperación real.
-
 % CÁLCULO DE LA DURACIÓN DE LA CAÍDA: Tiempo de recuperación - Tiempo en el máximo.
-t_fall_duration = t_recovery - t_max;
+t_fall_duration = t_total - t_max;
 
 % Conversión de la duración de caída a formato H:M:S.
 H_fall = floor(t_fall_duration / 3600);
@@ -286,11 +285,11 @@ S_fall = mod(t_fall_duration, 60);
 t_str_fall = sprintf('%02d h,%02d min, %05.2f s', H_fall, M_fall, S_fall);
 
 % --- Tarea 2: Velocidades medias de ascenso ---
-t_ascend = t(1:idx_max); % Datos de tiempo durante el ascenso.
-z_ascend = z(1:idx_max); % Datos de altitud durante el ascenso.
+t_ascend = t(t<=t_exp); % Datos de tiempo durante el ascenso.
+z_ascend = z(1:length(t_ascend)); % Datos de altitud durante el ascenso.
 
 % 1. Velocidad media de ascenso simple (Altura Máxima / Tiempo Máximo).
-v_avg_simple = z_max / t_max;
+v_avg_simple = (z_exp-z0) / t_exp;
 
 % 2. Velocidad media de ascenso por ajuste lineal (Mínimos Cuadrados).
 P_fit = polyfit(t_ascend, z_ascend, 1);
@@ -299,11 +298,13 @@ v_avg_fit = P_fit(1); % El coeficiente P(1) es la pendiente (velocidad).
 % IMPRESIÓN DE RESULTADOS
 fprintf('\n--- Resultados de Datos y Velocidad ---\n');
 fprintf('Altitud inicial: %.2f m\n', z0);
-fprintf('Tiempo de explosión del globo (Máximo): %s\n', t_str);
+fprintf('Tiempo de explosión del globo: %s\n', t_exp_str);
+fprintf('Altitud de explosión: %.2f m\n', z_exp);
+fprintf('Tiempo de máxima altitud del globo: %s\n', t_str);
 fprintf('Altitud máxima alcanzada: %.2f m\n', z_max);
 fprintf('-------------------------------------------\n');
 fprintf('Tiempo total del vuelo (final de los datos): %s\n', t_str_total);
-fprintf('Duración de la caída del payload (desde Máximo hasta %.2f m): %s\n', z_recovery, t_str_fall);
+fprintf('Duración de la caída del payload: %s\n', t_str_fall);
 fprintf('-------------------------------------------\n');
 fprintf('Velocidad media de ascenso (simple): %.4f m/s\n', v_avg_simple);
 fprintf('Velocidad media de ascenso (ajuste lineal): %.4f m/s\n', v_avg_fit);
