@@ -211,7 +211,7 @@ clear ruta tf_add t_aux w_aux index z_aux t0_aux
 % Variables de entrada asumidas: 't' (tiempo), 'z' (altitud) y 'dz_dt' (velocidad).
 z0 = z(1); % Altitud inicial del sistema.
 
-%% CÁLCULO DEL TIEMPO TOTAL DE VUELO
+% CÁLCULO DEL TIEMPO TOTAL DE VUELO
 t_total = t(end); % Tiempo total del vuelo en segundos.
 % Conversión del tiempo total a formato H:M:S para visualización.
 H_total = floor(t_total / 3600);
@@ -219,7 +219,7 @@ M_total = floor(mod(t_total, 3600) / 60);
 S_total = mod(t_total, 60);
 t_str_total = sprintf('%02d h,%02d min, %05.2f s', H_total, M_total, S_total);
 
-%% =================================================================
+% =================================================================
 % GRÁFICAS DE VUELO
 % =================================================================
 
@@ -270,7 +270,7 @@ ylabel('velocidad (m/s)')
 grid on
 hold off
 
-%% =================================================================
+% =================================================================
 % CÁLCULOS ADICIONALES (Duración de Caída y Velocidades Medias)
 % =================================================================
 
@@ -295,6 +295,14 @@ v_avg_simple = (z_exp-z0) / t_exp;
 P_fit = polyfit(t_ascend, z_ascend, 1);
 v_avg_fit = P_fit(1); % El coeficiente P(1) es la pendiente (velocidad).
 
+% Tiempo de transición
+t_trans = t_max - t_ascend;
+
+H_trans = floor(t_trans / 3600);
+M_trans = floor(mod(t_trans, 3600) / 60);
+S_trans = mod(t_trans, 60);
+t_str_trans = sprintf('%02d h,%02d min, %05.2f s', H_trans, M_trans, S_trans);
+
 % IMPRESIÓN DE RESULTADOS
 fprintf('\n--- Resultados de Datos y Velocidad ---\n');
 fprintf('Altitud inicial: %.2f m\n', z0);
@@ -305,12 +313,13 @@ fprintf('Altitud máxima alcanzada: %.2f m\n', z_max);
 fprintf('-------------------------------------------\n');
 fprintf('Tiempo total del vuelo (final de los datos): %s\n', t_str_total);
 fprintf('Duración de la caída del payload: %s\n', t_str_fall);
+fprintf('Duración del periodo de transición: %s\n', t_str_trans);
 fprintf('-------------------------------------------\n');
 fprintf('Velocidad media de ascenso (simple): %.4f m/s\n', v_avg_simple);
 fprintf('Velocidad media de ascenso (ajuste lineal): %.4f m/s\n', v_avg_fit);
 
 
-%% =================================================================
+% =================================================================
 % TAREA 3: MODELADO DEL DESCENSO CON AJUSTES FUNCIONALES
 % =================================================================
 
@@ -320,33 +329,54 @@ z_descent = z(idx_max:end);
 % Normalizar el tiempo para que t'=0 en el punto máximo.
 t_prime_descent = t_descent - t_descent(1);
 
-% 1. Ajuste Polinomial (Grado 3).
-[P_poly3, ~, MU_poly] = polyfit(t_prime_descent, z_descent, 3);
+% 1. Ajuste Polinomial (Grado 2).
+[P_poly2, S_2, MU_poly_2] = polyfit(t_prime_descent, z_descent, 2);
 % Evaluar el polinomio usando los parámetros de normalización (MU) para mayor estabilidad.
-z_fit_poly3 = polyval(P_poly3, t_prime_descent, [], MU_poly);
+[z_fit_poly2, delta_2] = polyval(P_poly2, t_prime_descent, S_2, MU_poly);
 
-% 2. Ajuste Exponencial (Aproximación lineal sobre el logaritmo).
+% 2. Ajuste Polinomial (Grado 3).
+[P_poly3, S_3, MU_poly_3] = polyfit(t_prime_descent, z_descent, 3);
+% Evaluar el polinomio usando los parámetros de normalización (MU) para mayor estabilidad.
+[z_fit_poly3, delta_3] = polyval(P_poly2, t_prime_descent, S_3, MU_poly);
+
+% 3. Ajuste Exponencial (Aproximación lineal sobre el logaritmo).
 z_final = z(end);
 z_diff = z_descent - z_final;
 % Evitar log(0): reemplazar valores no positivos con un número muy pequeño (eps).
 z_diff(z_diff <= 0) = eps;
 
 % Ajuste lineal (Grado 1) sobre log(z - z_final) vs. t'.
-[P_exp, ~, MU_exp] = polyfit(t_prime_descent, log(z_diff), 1);
+[P_exponent, S_exponent, MU_exponent] = polyfit(t_prime_descent, log(z_diff), 1);
+[z_fit_exponent, delta_exponent] = polyval(P_exponent, t_prime_descent, S_exponent, MU_exponent);
 
 % Calcular los coeficientes c1 y c2 para el modelo exponencial z = z_final + exp(c1 + c2 * t').
-c2_exp = P_exp(1) / MU_exp(2);      % c2 (pendiente)
-c1_exp = P_exp(2) - c2_exp * MU_exp(1); % c1 (intercepto)
+% c2_exp = P_exp(1) / MU_exp(2);      % c2 (pendiente)
+% c1_exp = P_exp(2) - c2_exp * MU_exp(1); % c1 (intercepto)
 
 % Evaluar el modelo exponencial.
-z_fit_exp = z_final + exp(c1_exp + c2_exp * t_prime_descent);
+% z_fit_exp = z_final + exp(c1_exp + c2_exp * t_prime_descent);
 
 % --- Gráfica 3: Altitud en el Descenso con Ajustes ---
 figure(3)
-plot(t_descent, z_descent, 'b.', 'MarkerSize', 8);
 hold on
+plot(t_descent, z_descent, 'b.', 'MarkerSize', 8);
+plot(t_descent, z_fit_poly2, 'r-', 'LineWidth', 2);
+hold off
+
+figure(4)
+hold on
+plot(t_descent, z_descent, 'b.', 'MarkerSize', 8);
 plot(t_descent, z_fit_poly3, 'r-', 'LineWidth', 2);
-plot(t_descent, z_fit_exp, 'g--', 'LineWidth', 2);
+hold off
+
+figure(5)
+hold on
+plot(t_descent, z_descent, 'b.', 'MarkerSize', 8);
+plot(t_descent, (z_final + exp(z_fit_exponent)), 'g', 'LineWidth', 2);
+plot(t_descent, (z_final + exp(z_fit_exponent + delta_exponent)), 'm--', 'LineWidth', 2);
+plot(t_descent, (z_final + exp(z_fit_exponent - delta_exponent)), 'm--', 'LineWidth', 2);
+plot(t_descent, (z_final + exp(z_fit_exponent + 2*delta_exponent)), 'r--', 'LineWidth', 2);
+plot(t_descent, (z_final + exp(z_fit_exponent - 2*delta_exponent)), 'r--', 'LineWidth', 2);
 hold off
 
 title('Altitud durante el Descenso con Ajustes (Polinomial y Exponencial)')
