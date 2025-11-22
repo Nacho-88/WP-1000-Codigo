@@ -77,7 +77,7 @@ A1 = 3.25;         % Área paracaidas 1 (m^2)
 A2 = 1.13;         % Área paracaidas 1 (m^2)
 
 
-M_caja = 2.21553;  % Masa del payload (kg)
+M_caja = 3.2;      % Masa del payload (kg)
 
 M_globo = 2;       % Masa del globo (kg)
 
@@ -92,8 +92,8 @@ save constantes G M_T R_T g_0 P_0 T_n R m_a m_He_molar R_prima z_n T_n C_D_caja 
 
 R_exp = 12.4/2;                          % m
 z_exp_est = 37550;                       % m
-R_0 = 2.55/2;                            % m
-T_amb = 15;                              % ºC
+R_0 = 2.4/2;                             % m
+T_amb = 18;                              % ºC
 P_amb = 89876;                           % Pa
 validacion = true;                       % booleano para elegir la forma de calcular la masa de helio
 
@@ -106,7 +106,7 @@ save constantes.mat P_n -append
 
 m_He = calcularMasaHelio(R_exp, R_0, z_exp_est, T_amb, P_amb, validacion);   % kg
 
-[P_b, delta_P, Nozzle_Lift] = llenado(m_He, R_0, T_amb);  % P_b [bar]     Nozzle_Lift [N]
+[P_b, delta_P, Nozzle_Lift] = llenado(m_He, T_amb);  % P_b [bar]     Nozzle_Lift [N]
 
 
 path(ruta);
@@ -197,7 +197,7 @@ end
 save parametros z dz_dt t -append   % Guardamos los parámetros calculados.
 
 % Hay que cambiar el archivo en función del vuelo que se esté simulando
-save Funciones\vuelo_n8.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
+save Resultados_simulaciones\vuelo_n11.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
 
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
 path(ruta)

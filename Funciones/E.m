@@ -3,7 +3,6 @@ function empuje = E(z, m_He)
 % Calcula la fuerza de empuje del globo que permite el ascenso a partir de la altitud (real/geométrica).
 % Entrada: z (altitud geometrica), m_he (amsa de Helio en kg)
 % Salida: empuje (medido en Newtons)
-% z_star = 12000 m
 % Depende de R_globo(z,mHe) y P(z)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -18,7 +17,6 @@ end
 
 
 % Intervalos par para el método de Simpson
-% N = 200;
 N = 20;
 
 if mod(N,2) ~= 0

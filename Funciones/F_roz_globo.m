@@ -19,26 +19,6 @@ if R_z <= 0
    return;
 end
 
-% Intervalos par para el método de Simpson
-% N = 200;
-% 
-% if mod(N,2) ~= 0
-%    N = N + 1;
-% end
-% 
-% % Integración
-% a = 0;
-% b = R_z;
-% 
-% x = linspace(a, b, N+1);  % vector de nodos
-% dx = (b - a) / N;         % paso entre nodos
-% f = @(zz) rho_atm(z + zz) .* zz;
-% 
-% I_h = regla_de_simpson(dx, x, f);
-% 
-% % Fuerza de rozamiento
-% F = -pi*(dz_dt.^2)*C_D_globo*I_h;
-
 % Fuerza de rozamiento
 R_g = R_globo(z,m_He);
 F = -pi*(dz_dt.^2)*C_D_globo*R_g^2*rho_atm(z+3*R_g/8)/2;
