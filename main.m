@@ -538,3 +538,38 @@ clear delta_3 MU_poly_3 P_poly3 S_3 z_fit_poly3
 clear delta_exponent MU_exponent P_exponent S_exponent z_fit_exponent
 clear z_descent z_ascend z_diff z_final
 clear ax P_fit_1 P_fit_2 idx_max
+
+
+%% Comparación perfil de vuelo simulado vs experimental
+
+% Si es posible los datos experimentales utilizados son los de la hojaIridium Satlink.
+% La importación de los datos de excel se hace de forma manual con el botón Import Data en el apartado HOME.
+% Es necesario cambiar el nombre del archivo dentro del código y los límites de los vectores cada vez que se quiera validar un vuelo diferente 
+
+z_experimental = [INTABALLOON2020Flightn6AyllonFinalS3.VarName3(1:577); 
+                  INTABALLOON2020Flightn6AyllonFinalS3.VarName3(589:end);
+                  INTABALLOON2020Flightn6AyllonFinalS3.VarName4(end)];        %m
+
+t_experimental = ones(length(z_experimental), 1);
+t_experimental(1) = 0;
+
+delta_t = [INTABALLOON2020Flightn6AyllonFinalS3.VarName9(1:577); 
+           INTABALLOON2020Flightn6AyllonFinalS3.VarName9(589:end)];            % s
+
+for i = 1 : length(delta_t)
+    t_experimental(i+1) = t_experimental(i) + delta_t(i);
+end
+
+figure(11)
+plot(t, z, 'b', 'MarkerSize', 8);
+hold on
+plot(t_experimental, z_experimental, 'r', 'MarkerSize', 8);
+grid on
+title('Perfil de vuelo n6 simulado vs experimental')
+legend('Simulación', 'Experimental')
+xlabel('Tiempo (s)')
+ylabel('Altitud (m)')
+ax = gca;
+ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
+hold off
+
