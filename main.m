@@ -315,6 +315,9 @@ v_avg_fit_1 = P_fit_1(1)/MU_fit_1(2); % El coeficiente P(1) es la pendiente (vel
 % devuelto está evaluado en (t-MU(1))/MU(2) en vez de t.
 v_avg_fit_2 = P_fit_2(1)/(MU_fit_2(2))^2*(t_ascend(end)+t_ascend(1)-2*MU_fit_2(1)) + P_fit_2(2)/MU_fit_2(2);
 
+v_inicial_min_cuad = P_fit_2(2)/MU_fit_2(2) - 2*P_fit_2(1)*MU_fit_2(1)/(MU_fit_2(2))^2;
+a_min_cuad = P_fit_2(1)/(2*MU_fit_2(2)^2);
+
 % Tiempo de transición
 t_trans = t_max - t_exp;
 
@@ -340,7 +343,9 @@ fprintf('Velocidad media de ascenso (simple): %.4f m/s\n', v_avg_simple);
 fprintf('Velocidad media de ascenso (media aritmética): %.4f m/s\n', v_avg_suma_arit);
 fprintf('Velocidad media de ascenso (media ponderada): %.4f m/s\n', v_avg_suma_pond);
 fprintf('Velocidad media de ascenso (ajuste lineal): %.4f m/s\n', v_avg_fit_1);
+fprintf('Valor de R\xB2 para el ajuste lineal: %.6f \n', S_fit_1.rsquared);
 fprintf('Velocidad media de ascenso (ajuste parabólico): %.4f m/s\n', v_avg_fit_2);
+fprintf('Valor de R\xB2 para el ajuste parabólico: %.6f \n', S_fit_2.rsquared);
 
 % Gráficas de los ajustes de mínimos cuadrados para el ascenso
 figure(3)
@@ -350,10 +355,13 @@ plot(t_ascend, z_fit_1, 'g--', 'LineWidth', 2);
 plot(t_ascend, z_fit_2, 'm--', 'LineWidth', 2);
 hold off
 
+str_fit_1 = sprintf('Ajuste lineal (R\xB2 = %.4f)', S_fit_1.rsquared);
+str_fit_2 = sprintf('Ajuste parabólico (R\xB2 = %.4f)', S_fit_2.rsquared);
+
 title('Altitud durante el Ascenso con Ajustes Polinomiales')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
-legend('Datos de Ascenso', 'Ajuste Polinomial (Grado 1)', 'Ajuste Polinomial (Grado 2)', 'Location', 'best')
+legend('Datos de Ascenso', str_fit_1, str_fit_2, 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -372,7 +380,7 @@ hold off
 title('Ajuste polinomial (Grado 1) durante el ascenso')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
-legend('Datos de Ascenso', 'Ajuste Polinomial (Grado 1)', 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
+legend('Datos de Ascenso', str_fit_1, 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -391,7 +399,7 @@ hold off
 title('Ajuste polinomial (Grado 2) durante el ascenso')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
-legend('Datos de Ascenso', 'Ajuste Polinomial (Grado 2)', 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
+legend('Datos de Ascenso', str_fit_2, 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -437,10 +445,14 @@ plot(t_descent, z_fit_poly3, 'm--', 'LineWidth', 2);
 plot(t_descent, (z_final + exp(z_fit_exponent)), 'r--', 'LineWidth', 2);
 hold off
 
+str_fit_poly2 = sprintf('Ajuste parabólico (R\xB2 = %.4f)', S_2.rsquared);
+str_fit_poly3 = sprintf('Ajuste cúbico (R\xB2 = %.4f)', S_3.rsquared);
+str_fit_exponent = sprintf('Ajuste exponencial (R\xB2 = %.4f)', S_exponent.rsquared);
+
 title('Altitud durante el Descenso con Ajustes (Polinomiales y Exponencial)')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
-legend('Datos de Descenso', 'Ajuste Polinomial (Grado 2)', 'Ajuste Polinomial (Grado 3)', 'Ajuste Exponencial', 'Location', 'best')
+legend('Datos de Descenso', str_fit_poly2, str_fit_poly3, str_fit_exponent, 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -459,7 +471,7 @@ hold off
 title('Ajuste polinomial (grado 2) durante el descenso')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
-legend('Datos de Descenso', 'Ajuste Polinomial (Grado 2)', 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
+legend('Datos de Descenso', str_fit_poly2, 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -478,7 +490,7 @@ hold off
 title('Ajuste polinomial (grado 3) durante el descenso')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
-legend('Datos de Descenso', 'Ajuste Polinomial (Grado 3)', 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
+legend('Datos de Descenso', str_fit_poly3, 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -495,9 +507,9 @@ plot(t_descent, (z_final + exp(z_fit_exponent - 2*delta_exponent)), 'r--', 'Line
 hold off
 
 title('Ajuste exponencial durante el descenso')
-xlabel('tiempo (s)')
-ylabel('altura (m)')
-legend('Datos de Descenso', 'Ajuste Exponencial', 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
+xlabel('Tiempo (s)')
+ylabel('Altitud (m)')
+legend('Datos de Descenso', str_fit_exponent, 'Margen de error de 68%', '', 'Margen de error de 95%', '', 'Location', 'best')
 grid on
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
@@ -517,8 +529,8 @@ plot(t_asc_des, z_min_cuad, 'r--', 'LineWidth', 2);
 hold off
 
 title('Comparación datos con ajustes')
-xlabel('tiempo (s)')
-ylabel('altura (m)')
+xlabel('Tiempo (s)')
+ylabel('Altitud (m)')
 legend('Datos Ascenso-Descenso', 'Ajustes por Mínimos Cuadrados', 'Location', 'best')
 grid on
 ax = gca;
@@ -530,11 +542,11 @@ ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
 clear H H_fall H_total H_trans
 clear M M_fall M_total M_trans
 clear S S_fall S_total S_trans
-clear t_ascend t_descent t_exp_str t_fall_duration t_max t_prime_descent t_str t_str_fall t_str_total t_str_trans t_trans t_total
-clear delta_fit_1 MU_fit_1 P_fit_1 S_fit_1 z_fit_1
-clear delta_fit_2 MU_fit_2 P_fit_2 S_fit_2 z_fit_2
-clear delta_2 MU_poly_2 P_poly2 S_2 z_fit_poly2
-clear delta_3 MU_poly_3 P_poly3 S_3 z_fit_poly3
-clear delta_exponent MU_exponent P_exponent S_exponent z_fit_exponent
-clear z_descent z_ascend z_diff z_final
-clear ax P_fit_1 P_fit_2 idx_max
+clear t_ascend t_asc_des t_descent t_exp_str t_fall_duration t_max t_prime_descent t_str t_str_fall t_str_total t_str_trans t_trans t_total
+clear delta_fit_1 MU_fit_1 P_fit_1 S_fit_1 z_fit_1 str_fit_1
+clear delta_fit_2 MU_fit_2 P_fit_2 S_fit_2 z_fit_2 str_fit_2
+clear delta_2 MU_poly_2 P_poly2 S_2 z_fit_poly2 str_fit_poly2
+clear delta_3 MU_poly_3 P_poly3 S_3 z_fit_poly3 str_fit_poly3
+clear delta_exponent MU_exponent P_exponent S_exponent z_fit_exponent str_fit_exponent
+clear z_ascend z_asc_des z_descent z_diff z_min_cuad z_final
+clear ax idx_max
