@@ -316,7 +316,7 @@ v_avg_fit_1 = P_fit_1(1)/MU_fit_1(2); % El coeficiente P(1) es la pendiente (vel
 v_avg_fit_2 = P_fit_2(1)/(MU_fit_2(2))^2*(t_ascend(end)+t_ascend(1)-2*MU_fit_2(1)) + P_fit_2(2)/MU_fit_2(2);
 
 % Tiempo de transición
-t_trans = t_max - t_ascend;
+t_trans = t_max - t_exp;
 
 % Conversión a formato H:M:S
 H_trans = floor(t_trans / 3600);
