@@ -201,7 +201,7 @@ end
 save parametros z dz_dt t -append   % Guardamos los parámetros calculados.
 
 % Hay que cambiar el archivo en función del vuelo que se esté simulando
-save Resultados_simulaciones\vuelo_n11.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
+save Resultados_simulaciones\Vuelo_n11\vuelo_n11.mat z dz_dt t m_He z_exp t_exp  % Guardamos los parámetros de este vuelo en una carpeta dedicada a él.
 
 % Vuelta a la ruta de búsqueda inicial (no la volvemos a usar en adelante).
 path(ruta)
@@ -552,7 +552,7 @@ clear z_ascend z_asc_des z_descent z_diff z_min_cuad z_final
 clear ax idx_max
 
 
-%% Comparación perfil de vuelo simulado vs experimental
+%% Comparación Simulación vs Datos experimentales
 
 % Si es posible los datos experimentales utilizados son los de la hojaIridium Satlink.
 % La importación de los datos de excel se hace de forma manual con el botón Import Data en el apartado HOME.
@@ -560,28 +560,48 @@ clear ax idx_max
 
 z_experimental = [INTABALLOON2020Flightn6AyllonFinalS3.VarName3(1:577); 
                   INTABALLOON2020Flightn6AyllonFinalS3.VarName3(589:end);
-                  INTABALLOON2020Flightn6AyllonFinalS3.VarName4(end)];        %m
+                  INTABALLOON2020Flightn6AyllonFinalS3.VarName4(end)];        % m
+
+v_experimental = [INTABALLOON2020Flightn6AyllonFinalS3.VarName10(1:577); 
+                  INTABALLOON2020Flightn6AyllonFinalS3.VarName10(589:end)];   % m/s
 
 t_experimental = ones(length(z_experimental), 1);
 t_experimental(1) = 0;
 
 delta_t = [INTABALLOON2020Flightn6AyllonFinalS3.VarName9(1:577); 
-           INTABALLOON2020Flightn6AyllonFinalS3.VarName9(589:end)];            % s
+           INTABALLOON2020Flightn6AyllonFinalS3.VarName9(589:end)];           % s
 
 for i = 1 : length(delta_t)
     t_experimental(i+1) = t_experimental(i) + delta_t(i);
 end
 
+
+% Perfil de vuelo
 figure(11)
 plot(t, z, 'b', 'MarkerSize', 8);
 hold on
 plot(t_experimental, z_experimental, 'r', 'MarkerSize', 8);
 grid on
-title('Perfil de vuelo n6 simulado vs experimental')
+title('Comparación Perfil de Vuelo n6')
 legend('Simulación', 'Experimental')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
 ax = gca;
 ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
 hold off
+
+
+% Perfil de velocidades
+figure(12)
+plot(t, dz_dt, 'b', 'MarkerSize', 8)
+hold on
+plot(t_experimental(2:end), v_experimental, 'r', 'MarkerSize', 8)
+grid on
+title('Comparación Perfil de Velocidades n6')
+xlabel('Tiempo (s)')
+ylabel('Velocidad (m/s)')
+ax = gca;
+ax.YAxis.Exponent = 0; % Evitar notación científica en el eje Y.
+hold off
+
 
