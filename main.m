@@ -558,52 +558,52 @@ clear ax idx_max
 % La importación de los datos de excel se hace de forma manual con el botón Import Data en el apartado HOME.
 % Es necesario cambiar el nombre del archivo dentro del código y los límites de los vectores cada vez que se quiera validar un vuelo diferente 
 
-load Resultados_simulaciones\Vuelo_n14\excel.mat
-load Resultados_simulaciones\Vuelo_n14\vuelo_n14.mat
+load Vuelo_informe\excel.mat
+load Vuelo_informe\vuelo.mat
 
 % Iridium Satlink
-% z_experimental = [INTABALLOON2021Flightn12AyllonFinalS2.VarName3(1:39); 
-%                   INTABALLOON2021Flightn12AyllonFinalS2.VarName3(48:end);
-%                   INTABALLOON2021Flightn12AyllonFinalS2.VarName4(end)];        % m
-% 
-% v_experimental = [INTABALLOON2021Flightn12AyllonFinalS2.VarName10(1:39);
-%                   INTABALLOON2021Flightn12AyllonFinalS2.VarName10(48:end)];   % m/s
+z_experimental = [UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName3(1:461); 
+                  UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName3(469:end);
+                  UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName4(end)];        % m
+
+v_experimental = [UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName10(1:461);
+                  UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName10(469:end)];   % m/s
 
 % Tiempo a partir de intervalos temporales
-% t_experimental = ones(length(z_experimental), 1);
-% t_experimental(1) = 0;
+t_experimental = ones(length(z_experimental), 1);
+t_experimental(1) = 0;
+
+delta_t = [UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName9(1:461); 
+           UAHBALLOON2025Pj1Pj2FlightUAH03CorralAyllonFINOkGracianoS6.VarName9(469:end)];           % s
+
+for i = 1 : length(delta_t)
+    t_experimental(i+1) = t_experimental(i) + delta_t(i);
+end
+
+
+
+% % Experiment Data_ARDUINO
+% z_experimental = INTABALLOON2021Flightn14AyllonFinalS4.Altitudem;              % m
+% aux_z = z_experimental<=1100;
+% z_experimental(aux_z) = [];
 % 
-% delta_t = [INTABALLOON2021Flightn12AyllonFinalS2.VarName9(1:39); 
-%            INTABALLOON2021Flightn12AyllonFinalS2.VarName9(48:end)];           % s
+% v_experimental = INTABALLOON2021Flightn14AyllonFinalS4.Speedkmh./3.6;          % m/s
+% v_experimental(aux_z) = [];
+% [~,idx] = max(z_experimental);
+% v_experimental(idx+1:end) = -v_experimental(idx+1:end);
 % 
-% for i = 1 : length(delta_t)
-%     t_experimental(i+1) = t_experimental(i) + delta_t(i);
-% end
-
-
-
-% Experiment Data_ARDUINO
-z_experimental = INTABALLOON2021Flightn14AyllonFinalS4.Altitudem;              % m
-aux_z = z_experimental<=1100;
-z_experimental(aux_z) = [];
-
-v_experimental = INTABALLOON2021Flightn14AyllonFinalS4.Speedkmh./3.6;          % m/s
-v_experimental(aux_z) = [];
-[~,idx] = max(z_experimental);
-v_experimental(idx+1:end) = -v_experimental(idx+1:end);
-
-% Tiempo a partir del formato hh:mm:ss
-aux = INTABALLOON2021Flightn14AyllonFinalS4.TimeUTC;
-aux(aux_z) = [];
-hora = floor(aux./10^4);
-minuto = floor((aux-hora.*10^4)./10^2);
-segundo = floor(aux-hora.*10^4-minuto.*10^2);
-
-hora = hora - hora(1);
-minuto = minuto - minuto(1);
-segundo = segundo - segundo(1);
-
-t_experimental = hora.*3600 + minuto.*60 + segundo;
+% % Tiempo a partir del formato hh:mm:ss
+% aux = INTABALLOON2021Flightn14AyllonFinalS4.TimeUTC;
+% aux(aux_z) = [];
+% hora = floor(aux./10^4);
+% minuto = floor((aux-hora.*10^4)./10^2);
+% segundo = floor(aux-hora.*10^4-minuto.*10^2);
+% 
+% hora = hora - hora(1);
+% minuto = minuto - minuto(1);
+% segundo = segundo - segundo(1);
+% 
+% t_experimental = hora.*3600 + minuto.*60 + segundo;
 
 
 
@@ -613,7 +613,7 @@ plot(t, z, 'b', 'MarkerSize', 8);
 hold on
 plot(t_experimental, z_experimental, 'r', 'MarkerSize', 8);
 grid on
-title('Comparación Perfil de Vuelo n14')
+title('Comparación Perfil de Vuelo')
 legend('Simulación', 'Experimental')
 xlabel('Tiempo (s)')
 ylabel('Altitud (m)')
@@ -626,9 +626,9 @@ hold off
 figure(12)
 plot(t, dz_dt, 'b', 'MarkerSize', 8)
 hold on
-plot(t_experimental, v_experimental, 'r', 'MarkerSize', 8)
+plot(t_experimental(2:end), v_experimental, 'r', 'MarkerSize', 8)
 grid on
-title('Comparación Perfil de Velocidades n14')
+title('Comparación Perfil de Velocidades')
 legend('Simulación', 'Experimental')
 xlabel('Tiempo (s)')
 ylabel('Velocidad (m/s)')
